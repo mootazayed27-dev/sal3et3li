@@ -163,10 +163,39 @@ button {
     border: 2px solid white;
 }
 
-/* Pinch to zoom container */
-.pinch-container {
-    position: relative;
-    display: inline-block;
+/* Multi-line text input */
+.multi-line-input {
+    resize: vertical;
+    min-height: 60px;
+    font-family: monospace;
+    line-height: 1.2;
+}
+
+.multi-line-hint {
+    font-size: 10px;
+    color: #6c757d;
+    margin-top: 2px;
+    margin-bottom: 8px;
+}
+
+/* Text mode toggle */
+.text-mode-toggle {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 8px;
+}
+
+.text-mode-btn {
+    flex: 1;
+    padding: 4px 8px !important;
+    font-size: 10px !important;
+    border: 1px solid #dee2e6 !important;
+}
+
+.text-mode-btn.active {
+    background: #007bff !important;
+    color: white !important;
+    border-color: #007bff !important;
 }
 
 /* --------------------------------------------------
@@ -228,6 +257,19 @@ body.dark .drag-instructions {
     background: #1a365d;
     border-color: #2d3748;
     color: #e2e8f0;
+}
+
+body.dark .text-mode-btn {
+    border-color: #555 !important;
+}
+
+body.dark .text-mode-btn.active {
+    background: #007bff !important;
+    border-color: #007bff !important;
+}
+
+body.dark .multi-line-hint {
+    color: #adb5bd;
 }
 
 /* --------------------------------------------------
@@ -560,6 +602,20 @@ body.dark .upload-section h6 {
     h3 {
         font-size: 1rem !important;
         margin-bottom: 10px !important;
+    }
+    
+    .multi-line-input {
+        min-height: 50px;
+        font-size: 12px;
+    }
+    
+    .text-mode-toggle {
+        gap: 3px;
+    }
+    
+    .text-mode-btn {
+        padding: 3px 6px !important;
+        font-size: 9px !important;
     }
 }
 
