@@ -67,12 +67,29 @@
                     <button onclick="addUserTemplate()" class="btn btn-outline-primary w-100 py-1">Add Template</button>
                 </div>
 
-                <!-- Text Inputs -->
-                <label class="form-label fw-bold mt-2 mt-md-3 mobile-text-sm">Top Text</label>
-                <input type="text" id="topText" class="form-control mb-2" placeholder="Top text" oninput="drawMeme()" style="font-size: 14px;">
+                <!-- Text Mode Toggle -->
+                <div class="text-mode-toggle">
+                    <button class="btn text-mode-btn active" onclick="setTextMode('single')">Single Line</button>
+                    <button class="btn text-mode-btn" onclick="setTextMode('multi')">Multi Line</button>
+                </div>
 
-                <label class="form-label fw-bold mobile-text-sm">Bottom Text</label>
-                <input type="text" id="bottomText" class="form-control mb-2 mb-md-3" placeholder="Bottom text" oninput="drawMeme()" style="font-size: 14px;">
+                <!-- Single Line Text Inputs -->
+                <div id="singleLineText" class="text-input-section">
+                    <label class="form-label fw-bold mobile-text-sm">Top Text</label>
+                    <input type="text" id="topText" class="form-control mb-2" placeholder="Top text" oninput="drawMeme()" style="font-size: 14px;">
+
+                    <label class="form-label fw-bold mobile-text-sm">Bottom Text</label>
+                    <input type="text" id="bottomText" class="form-control mb-2 mb-md-3" placeholder="Bottom text" oninput="drawMeme()" style="font-size: 14px;">
+                </div>
+
+                <!-- Multi Line Text Input -->
+                <div id="multiLineText" class="text-input-section" style="display: none;">
+                    <label class="form-label fw-bold mobile-text-sm">Meme Text</label>
+                    <textarea id="multiText" class="form-control multi-line-input mb-1" placeholder="Enter text line by line&#10;Example:&#10;Hello&#10;World&#10;This is a meme" oninput="drawMeme()" style="font-size: 14px;"></textarea>
+                    <div class="multi-line-hint">
+                        💡 Each line will be displayed separately. Use Enter to create new lines.
+                    </div>
+                </div>
 
                 <!-- Text Position Controls -->
                 <div class="position-controls">
@@ -149,6 +166,7 @@
     let strokeWidth = 2;
     let textColor = "#ffffff";
     let strokeColor = "#000000";
+    let textMode = "single"; // "single" or "multi"
 
     // Drag state variables
     let isDragging = false;
@@ -184,6 +202,28 @@
 
     // User templates storage
     let userTemplates = JSON.parse(localStorage.getItem('userTemplates')) || [];
+
+    // Set text mode (single or multi line)
+    function setTextMode(mode) {
+        textMode = mode;
+        
+        // Update button states
+        document.querySelectorAll('.text-mode-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        event.target.classList.add('active');
+        
+        // Show/hide text inputs
+        if (mode === 'single') {
+            document.getElementById('singleLineText').style.display = 'block';
+            document.getElementById('multiLineText').style.display = 'none';
+        } else {
+            document.getElementById('singleLineText').style.display = 'none';
+            document.getElementById('multiLineText').style.display = 'block';
+        }
+        
+        drawMeme();
+    }
 
     // Dark mode toggle functionality
     document.getElementById("toggle-dark").addEventListener("change", function() {
@@ -548,6 +588,7 @@
     function drawMeme() {
         const topText = document.getElementById("topText").value;
         const bottomText = document.getElementById("bottomText").value;
+        const multiText = document.getElementById("multiText").value;
 
         if (!currentImage.complete) return;
 
@@ -561,19 +602,41 @@
         ctx.lineWidth = strokeWidth;
         ctx.textAlign = "center";
 
-        const topX = (topTextX / 100) * canvas.width;
-        const topY = (topTextY / 100) * canvas.height;
-        const bottomX = (bottomTextX / 100) * canvas.width;
-        const bottomY = (bottomTextY / 100) * canvas.height;
+        if (textMode === 'single') {
+            // Single line mode - top and bottom text
+            const topX = (topTextX / 100) * canvas.width;
+            const topY = (topTextY / 100) * canvas.height;
+            const bottomX = (bottomTextX / 100) * canvas.width;
+            const bottomY = (bottomTextY / 100) * canvas.height;
 
-        if (topText) {
-            ctx.strokeText(topText.toUpperCase(), topX, topY);
-            ctx.fillText(topText.toUpperCase(), topX, topY);
-        }
+            if (topText) {
+                ctx.strokeText(topText.toUpperCase(), topX, topY);
+                ctx.fillText(topText.toUpperCase(), topX, topY);
+            }
 
-        if (bottomText) {
-            ctx.strokeText(bottomText.toUpperCase(), bottomX, bottomY);
-            ctx.fillText(bottomText.toUpperCase(), bottomX, bottomY);
+            if (bottomText) {
+                ctx.strokeText(bottomText.toUpperCase(), bottomX, bottomY);
+                ctx.fillText(bottomText.toUpperCase(), bottomX, bottomY);
+            }
+        } else {
+            // Multi line mode - stack text vertically
+            const lines = multiText.split('\n').filter(line => line.trim() !== '');
+            const totalLines = lines.length;
+            
+            if (totalLines > 0) {
+                const startY = (topTextY / 100) * canvas.height;
+                const lineHeight = textSize * 1.2; // Space between lines
+                
+                lines.forEach((line, index) => {
+                    const yPos = startY + (index * lineHeight);
+                    const xPos = (topTextX / 100) * canvas.width;
+                    
+                    if (line.trim()) {
+                        ctx.strokeText(line.toUpperCase(), xPos, yPos);
+                        ctx.fillText(line.toUpperCase(), xPos, yPos);
+                    }
+                });
+            }
         }
         
         if (topHandle) {
