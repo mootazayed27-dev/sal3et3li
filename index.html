@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Meme Generator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container py-3 py-md-5">
+
+    <header class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
+        <h1 class="fw-bold display-5 text-center text-md-start mb-3 mb-md-0">🎨 Ultimate Meme Generator</h1>
+        <div class="d-flex align-items-center">
+            <input type="checkbox" id="toggle-dark">
+            <label for="toggle-dark" id="darkToggle">
+                <div class="circle">
+                    <svg class="sun" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 18a6 6 0 100-12 6 6 0 000 12z"/>
+                    </svg>
+
+                    <svg class="moon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M21 12.79A9 9 0 0111.21 3a7 7 0 108.58 8.58 9.05 9.05 0 011.21 1.21z"/>
+                    </svg>
+                </div>
+            </label>
+        </div>
+    </header>
+
+    <div class="card main-card shadow-lg p-3 p-md-4">
+        <h3 class="mb-4 fw-semibold text-center text-md-start">Create Your Meme</h3>
+
+        <div class="row g-4">
+
+            <!-- Left Controls -->
+            <div class="col-md-4 pe-md-4 border-end" id="left-panel">
+
+                <!-- Template Gallery -->
+                <label class="form-label fw-bold">Choose Template</label>
+                <div class="template-search">
+                    <input type="text" id="templateSearch" class="form-control" placeholder="Search templates...">
+                </div>
+                
+                <div class="template-gallery">
+                    <div class="template-section">
+                        <h6>Popular Templates</h6>
+                        <div class="template-grid" id="templateGrid">
+                            <!-- Templates will be loaded by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <div class="template-section">
+                        <h6>My Uploads</h6>
+                        <div class="template-grid" id="userTemplatesGrid">
+                            <!-- User templates will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upload Section -->
+                <div class="upload-section">
+                    <h6>📤 Upload Your Own Template</h6>
+                    <input type="file" id="uploadTemplate" class="form-control mb-2" accept="image/*">
+                    <input type="text" id="templateNameInput" class="form-control mb-2" placeholder="Template name">
+                    <button onclick="addUserTemplate()" class="btn btn-outline-primary w-100 py-2">Add Template</button>
+                </div>
+
+                <!-- Text Inputs -->
+                <label class="form-label fw-bold mt-4">Top Text</label>
+                <input type="text" id="topText" class="form-control mb-3" placeholder="Top text" oninput="drawMeme()">
+
+                <label class="form-label fw-bold">Bottom Text</label>
+                <input type="text" id="bottomText" class="form-control mb-4" placeholder="Bottom text" oninput="drawMeme()">
+
+                <!-- Text Position Controls -->
+                <div class="position-controls">
+                    <h6 class="fw-bold mb-3">Text Style & Controls</h6>
+                    
+                    <div class="drag-instructions">
+                        <i>💡</i> Drag the colored circles on the canvas to position text
+                    </div>
+                    
+                    <div class="slider-group">
+                        <label>Text Size:</label>
+                        <div class="slider-container">
+                            <input type="range" id="textSize" class="form-range" min="20" max="100" value="50">
+                            <span id="textSizeValue" class="slider-value">50px</span>
+                        </div>
+                    </div>
+
+                    <div class="slider-group mt-3">
+                        <label>Stroke Width:</label>
+                        <div class="slider-container">
+                            <input type="range" id="strokeWidth" class="form-range" min="1" max="10" value="3">
+                            <span id="strokeWidthValue" class="slider-value">3px</span>
+                        </div>
+                    </div>
+
+                    <!-- Color Controls -->
+                    <div class="color-controls">
+                        <div class="color-group">
+                            <label>Text Color:</label>
+                            <div class="color-input-group">
+                                <input type="color" id="textColor" value="#ffffff" class="form-control form-control-color">
+                                <div id="textColorPreview" class="color-preview" style="background-color: #ffffff;"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="color-group">
+                            <label>Stroke Color:</label>
+                            <div class="color-input-group">
+                                <input type="color" id="strokeColor" value="#000000" class="form-control form-control-color">
+                                <div id="strokeColorPreview" class="color-preview" style="background-color: #000000;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <button onclick="drawMeme()" class="btn btn-primary w-100 mb-2 py-2 fw-semibold">Update Meme</button>
+                <button onclick="downloadMeme()" class="btn btn-success w-100 py-2 fw-semibold">Download Meme</button>
+            </div>
+
+            <!-- Canvas -->
+            <div class="col-md-8 text-center position-relative">
+                <canvas id="meme-canvas" class="border shadow-lg rounded-4"></canvas>
+                <!-- Text handles will be added here by JavaScript -->
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<script>
+    const canvas = document.getElementById("meme-canvas");
+    const ctx = canvas.getContext("2d");
+    let currentImage = new Image();
+
+    // Text position variables
+    let topTextX = 50; // Percentage
+    let topTextY = 15; // Percentage
+    let bottomTextX = 50; // Percentage
+    let bottomTextY = 85; // Percentage
+    let textSize = 50; // Font size in pixels
+    let strokeWidth = 3; // Stroke width in pixels
+    let textColor = "#ffffff"; // White text
+    let strokeColor = "#000000"; // Black stroke
+
+    // Drag state variables
+    let isDragging = false;
+    let currentHandle = null;
+    let startX, startY;
+    let startTopX, startTopY, startBottomX, startBottomY, startTextSize;
+
+    // Text handles
+    let topHandle, bottomHandle, sizeHandle;
+
+    // Meme templates data
+    const memeTemplates = [
+        { name: "Drake", url: "https://i.imgflip.com/30b1gx.jpg" },
+        { name: "Doge", url: "https://i.imgflip.com/4t0m5.jpg" },
+        { name: "Mocking Spongebob", url: "https://i.imgflip.com/1otk96.jpg" },
+        { name: "Two Buttons", url: "https://i.imgflip.com/1g8my4.jpg" },
+        { name: "Change My Mind", url: "https://i.imgflip.com/24y43o.jpg" },
+        { name: "Woman Yelling at Cat", url: "https://i.imgflip.com/345v97.jpg" },
+        { name: "Distracted Boyfriend", url: "https://i.imgflip.com/1ur9b0.jpg" },
+        { name: "Left Exit 12", url: "https://i.imgflip.com/22bdq6.jpg" },
+        { name: "Running Away Balloon", url: "https://i.imgflip.com/261o3j.jpg" },
+        { name: "Winnie the Pooh", url: "https://i.imgflip.com/2ybua0.jpg" },
+        { name: "Grumpy Cat", url: "https://i.imgflip.com/8p0a.jpg" },
+        { name: "Success Kid", url: "https://i.imgflip.com/2/2gtjf5.jpg" },
+        { name: "One Does Not Simply", url: "https://i.imgflip.com/1bij.jpg" },
+        { name: "Buff Doge vs Cheems", url: "https://i.imgflip.com/43a45p.jpg" },
+        { name: "Expanding Brain", url: "https://i.imgflip.com/1jwhww.jpg" },
+        { name: "Boardroom Meeting", url: "https://i.imgflip.com/m78d.jpg" },
+        { name: "Panik Kalm Panik", url: "https://i.imgflip.com/3qqcim.jpg" },
+        { name: "They're the Same", url: "https://i.imgflip.com/2odckz.jpg" },
+        { name: "American Chopper", url: "https://i.imgflip.com/6aa6f.jpg" },
+        { name: "Always Has Been", url: "https://i.imgflip.com/46e43q.jpg" },
+        { name: "I Bet He's Thinking", url: "https://i.imgflip.com/1tq6rb.jpg" },
+        { name: "Surprised Pikachu", url: "https://i.imgflip.com/2kbn1e.jpg" },
+        { name: "This is Fine", url: "https://i.imgflip.com/wxica.jpg" },
+        { name: "Unsettled Tom", url: "https://i.imgflip.com/2wifvo.jpg" }
+    ];
+
+    // User templates storage
+    let userTemplates = JSON.parse(localStorage.getItem('userTemplates')) || [];
+
+    // Dark mode toggle functionality
+    document.getElementById("toggle-dark").addEventListener("change", function() {
+        document.body.classList.toggle("dark", this.checked);
+    });
+
+    // Create text handles
+    function createTextHandles() {
+        const canvasContainer = canvas.parentElement;
+        
+        // Remove existing handles
+        document.querySelectorAll('.text-handle').forEach(handle => handle.remove());
+        
+        // Create top text handle
+        topHandle = document.createElement('div');
+        topHandle.className = 'text-handle top';
+        topHandle.style.position = 'absolute';
+        canvasContainer.appendChild(topHandle);
+        
+        // Create bottom text handle
+        bottomHandle = document.createElement('div');
+        bottomHandle.className = 'text-handle bottom';
+        bottomHandle.style.position = 'absolute';
+        canvasContainer.appendChild(bottomHandle);
+        
+        // Create size handle
+        sizeHandle = document.createElement('div');
+        sizeHandle.className = 'text-handle size';
+        sizeHandle.style.position = 'absolute';
+        canvasContainer.appendChild(sizeHandle);
+        
+        // Add event listeners for desktop
+        setupDragEvents(topHandle, 'top');
+        setupDragEvents(bottomHandle, 'bottom');
+        setupDragEvents(sizeHandle, 'size');
+        
+        updateHandlePositions();
+    }
+
+    // Setup drag events for handles
+    function setupDragEvents(handle, type) {
+        // Mouse events for desktop
+        handle.addEventListener('mousedown', startDrag);
+        
+        // Touch events for mobile
+        handle.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            startDrag(e.touches[0]);
+        });
+        
+        function startDrag(e) {
+            isDragging = true;
+            currentHandle = type;
+            startX = e.clientX;
+            startY = e.clientY;
+            startTopX = topTextX;
+            startTopY = topTextY;
+            startBottomX = bottomTextX;
+            startBottomY = bottomTextY;
+            startTextSize = textSize;
+            
+            // Add move and end listeners
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('touchmove', touchDrag, { passive: false });
+            document.addEventListener('mouseup', stopDrag);
+            document.addEventListener('touchend', stopDrag);
+        }
+        
+        function drag(e) {
+            if (!isDragging) return;
+            handleDrag(e.clientX, e.clientY);
+        }
+        
+        function touchDrag(e) {
+            if (!isDragging) return;
+            e.preventDefault();
+            handleDrag(e.touches[0].clientX, e.touches[0].clientY);
+        }
+        
+        function stopDrag() {
+            isDragging = false;
+            currentHandle = null;
+            document.removeEventListener('mousemove', drag);
+            document.removeEventListener('touchmove', touchDrag);
+            document.removeEventListener('mouseup', stopDrag);
+            document.removeEventListener('touchend', stopDrag);
+        }
+    }
+
+    // Handle drag movement
+    function handleDrag(clientX, clientY) {
+        const canvasRect = canvas.getBoundingClientRect();
+        const deltaX = clientX - startX;
+        const deltaY = clientY - startY;
+        
+        // Convert pixels to percentages
+        const deltaXPercent = (deltaX / canvasRect.width) * 100;
+        const deltaYPercent = (deltaY / canvasRect.height) * 100;
+        
+        switch(currentHandle) {
+            case 'top':
+                topTextX = Math.max(0, Math.min(100, startTopX + deltaXPercent));
+                topTextY = Math.max(0, Math.min(100, startTopY + deltaYPercent));
+                break;
+            case 'bottom':
+                bottomTextX = Math.max(0, Math.min(100, startBottomX + deltaXPercent));
+                bottomTextY = Math.max(0, Math.min(100, startBottomY + deltaYPercent));
+                break;
+            case 'size':
+                // Scale text size based on vertical movement
+                const sizeDelta = deltaY * -0.5; // Negative so dragging up increases size
+                textSize = Math.max(20, Math.min(100, startTextSize + sizeDelta));
+                document.getElementById('textSize').value = textSize;
+                document.getElementById('textSizeValue').textContent = textSize + 'px';
+                break;
+        }
+        
+        updateHandlePositions();
+        drawMeme();
+    }
+
+    // Update handle positions
+    function updateHandlePositions() {
+        const canvasRect = canvas.getBoundingClientRect();
+        const containerRect = canvas.parentElement.getBoundingClientRect();
+        
+        // Calculate positions relative to container
+        const topX = (topTextX / 100) * canvasRect.width + canvasRect.left - containerRect.left;
+        const topY = (topTextY / 100) * canvasRect.height + canvasRect.top - containerRect.top;
+        const bottomX = (bottomTextX / 100) * canvasRect.width + canvasRect.left - containerRect.left;
+        const bottomY = (bottomTextY / 100) * canvasRect.height + canvasRect.top - containerRect.top;
+        
+        // Position handles
+        topHandle.style.left = (topX - 10) + 'px';
+        topHandle.style.top = (topY - 10) + 'px';
+        
+        bottomHandle.style.left = (bottomX - 10) + 'px';
+        bottomHandle.style.top = (bottomY - 10) + 'px';
+        
+        // Position size handle near bottom text
+        sizeHandle.style.left = (bottomX + 20) + 'px';
+        sizeHandle.style.top = (bottomY - 10) + 'px';
+    }
+
+    // Initialize slider values and event listeners
+    function initializeSliders() {
+        const sliders = [
+            { id: 'textSize', variable: 'textSize', suffix: 'px' },
+            { id: 'strokeWidth', variable: 'strokeWidth', suffix: 'px' }
+        ];
+
+        sliders.forEach(slider => {
+            const sliderElement = document.getElementById(slider.id);
+            const valueElement = document.getElementById(slider.id + 'Value');
+            
+            if (sliderElement && valueElement) {
+                sliderElement.value = window[slider.variable];
+                valueElement.textContent = window[slider.variable] + slider.suffix;
+                
+                sliderElement.addEventListener('input', function() {
+                    window[slider.variable] = parseInt(this.value);
+                    valueElement.textContent = window[slider.variable] + slider.suffix;
+                    updateHandlePositions();
+                    drawMeme();
+                });
+            }
+        });
+
+        // Color pickers
+        const textColorPicker = document.getElementById('textColor');
+        const strokeColorPicker = document.getElementById('strokeColor');
+        const textColorPreview = document.getElementById('textColorPreview');
+        const strokeColorPreview = document.getElementById('strokeColorPreview');
+
+        textColorPicker.value = textColor;
+        strokeColorPicker.value = strokeColor;
+        textColorPreview.style.backgroundColor = textColor;
+        strokeColorPreview.style.backgroundColor = strokeColor;
+
+        textColorPicker.addEventListener('input', function() {
+            textColor = this.value;
+            textColorPreview.style.backgroundColor = textColor;
+            drawMeme();
+        });
+
+        strokeColorPicker.addEventListener('input', function() {
+            strokeColor = this.value;
+            strokeColorPreview.style.backgroundColor = strokeColor;
+            drawMeme();
+        });
+    }
+
+    // Initialize template gallery
+    function initializeTemplateGallery() {
+        const templateGrid = document.getElementById('templateGrid');
+        const userTemplatesGrid = document.getElementById('userTemplatesGrid');
+        const templateSearch = document.getElementById('templateSearch');
+        
+        // Load templates function
+        function loadTemplates(templates, container, filter = '') {
+            container.innerHTML = '';
+            const filteredTemplates = templates.filter(template => 
+                template.name.toLowerCase().includes(filter.toLowerCase())
+            );
+            
+            if (filteredTemplates.length === 0) {
+                container.innerHTML = '<div class="text-center w-100 py-3 text-muted">No templates found</div>';
+                return;
+            }
+            
+            filteredTemplates.forEach((template) => {
+                const templateItem = document.createElement('div');
+                templateItem.className = 'template-item';
+                templateItem.innerHTML = `
+                    <img src="${template.url}" alt="${template.name}" class="template-img" loading="lazy" onerror="this.src='https://via.placeholder.com/150/cccccc/666666?text=Image+Error'">
+                    <p class="template-name">${template.name}</p>
+                `;
+                
+                templateItem.addEventListener('click', () => {
+                    // Remove active class from all items
+                    document.querySelectorAll('.template-item').forEach(item => {
+                        item.classList.remove('active');
+                    });
+                    // Add active class to clicked item
+                    templateItem.classList.add('active');
+                    // Load the template
+                    loadImage(template.url);
+                });
+                
+                container.appendChild(templateItem);
+            });
+        }
+        
+        // Initial load
+        loadTemplates(memeTemplates, templateGrid);
+        loadTemplates(userTemplates, userTemplatesGrid);
+        
+        // Search functionality
+        templateSearch.addEventListener('input', (e) => {
+            loadTemplates(memeTemplates, templateGrid, e.target.value);
+            loadTemplates(userTemplates, userTemplatesGrid, e.target.value);
+        });
+        
+        // Select first template by default if none selected
+        setTimeout(() => {
+            const hasActive = document.querySelector('.template-item.active');
+            if (!hasActive && memeTemplates.length > 0) {
+                const firstItem = templateGrid.querySelector('.template-item');
+                if (firstItem) {
+                    firstItem.classList.add('active');
+                    loadImage(memeTemplates[0].url);
+                }
+            }
+        }, 100);
+    }
+    
+    // Add user template
+    function addUserTemplate() {
+        const fileInput = document.getElementById('uploadTemplate');
+        const nameInput = document.getElementById('templateNameInput');
+        const file = fileInput.files[0];
+        const name = nameInput.value.trim();
+        
+        if (!file) {
+            alert('Please select an image file');
+            return;
+        }
+        
+        if (!name) {
+            alert('Please enter a template name');
+            return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const newTemplate = {
+                name: name,
+                url: e.target.result
+            };
+            
+            userTemplates.push(newTemplate);
+            localStorage.setItem('userTemplates', JSON.stringify(userTemplates));
+            
+            // Reload user templates
+            initializeTemplateGallery();
+            
+            // Clear inputs
+            fileInput.value = '';
+            nameInput.value = '';
+            
+            alert('Template added successfully!');
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function loadImage(src) {
+        currentImage = new Image();
+        currentImage.crossOrigin = "anonymous";
+        currentImage.src = src;
+        currentImage.onload = () => {
+            // Set canvas dimensions based on image but limit for mobile
+            const maxWidth = window.innerWidth < 768 ? window.innerWidth - 40 : 600;
+            const scaleFactor = maxWidth / currentImage.width;
+            
+            canvas.width = maxWidth;
+            canvas.height = currentImage.height * scaleFactor;
+            
+            createTextHandles();
+            drawMeme();
+        };
+        
+        currentImage.onerror = () => {
+            console.error('Failed to load image:', src);
+            alert('Failed to load the selected template. Please try another one.');
+        };
+    }
+
+    function drawMeme() {
+        const topText = document.getElementById("topText").value;
+        const bottomText = document.getElementById("bottomText").value;
+
+        if (!currentImage.complete) return;
+
+        // Clear canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Draw image scaled to canvas
+        ctx.drawImage(currentImage, 0, 0, canvas.width, canvas.height);
+
+        // Set text properties
+        ctx.font = `bold ${textSize}px Impact`;
+        ctx.fillStyle = textColor;
+        ctx.strokeStyle = strokeColor;
+        ctx.lineWidth = strokeWidth;
+        ctx.textAlign = "center";
+
+        // Calculate positions based on percentages
+        const topX = (topTextX / 100) * canvas.width;
+        const topY = (topTextY / 100) * canvas.height;
+        const bottomX = (bottomTextX / 100) * canvas.width;
+        const bottomY = (bottomTextY / 100) * canvas.height;
+
+        // Draw top text
+        if (topText) {
+            ctx.strokeText(topText.toUpperCase(), topX, topY);
+            ctx.fillText(topText.toUpperCase(), topX, topY);
+        }
+
+        // Draw bottom text
+        if (bottomText) {
+            ctx.strokeText(bottomText.toUpperCase(), bottomX, bottomY);
+            ctx.fillText(bottomText.toUpperCase(), bottomX, bottomY);
+        }
+        
+        // Update handle positions after drawing
+        if (topHandle) {
+            updateHandlePositions();
+        }
+    }
+
+    function downloadMeme() {
+        if (!currentImage.complete) {
+            alert('Please wait for the image to load');
+            return;
+        }
+        
+        const link = document.createElement("a");
+        link.download = "meme.png";
+        link.href = canvas.toDataURL();
+        link.click();
+    }
+
+    // Handle window resize
+    window.addEventListener('resize', function() {
+        if (currentImage.src && currentImage.complete) {
+            const maxWidth = window.innerWidth < 768 ? window.innerWidth - 40 : 600;
+            const scaleFactor = maxWidth / currentImage.width;
+            
+            canvas.width = maxWidth;
+            canvas.height = currentImage.height * scaleFactor;
+            
+            updateHandlePositions();
+            drawMeme();
+        }
+    });
+
+    // Initialize everything when page loads
+    window.addEventListener('load', function() {
+        initializeSliders();
+        initializeTemplateGallery();
+    });
+</script>
+
+</body>
+</html>
