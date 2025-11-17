@@ -8,10 +8,11 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container py-3">
-        <header class="text-center mb-3">
+    <div class="container-fluid py-2">
+        <!-- Mobile Header -->
+        <header class="mobile-header d-block d-lg-none">
             <div class="d-flex justify-content-between align-items-center mb-2">
-                <h1 class="display-6 fw-bold text-primary">🎨 Meme Generator</h1>
+                <h1 class="h4 fw-bold text-primary mb-0">🎨 Meme Generator</h1>
                 <div class="dark-mode-toggle">
                     <input type="checkbox" id="darkModeToggle" class="d-none">
                     <label for="darkModeToggle" class="dark-mode-switch">
@@ -21,41 +22,87 @@
                     </label>
                 </div>
             </div>
-            <p class="text-muted">Create professional memes with multiple text areas</p>
         </header>
 
-        <div class="row g-3">
-            <!-- Left Panel - Controls -->
-            <div class="col-lg-4">
-                <div class="card shadow-sm">
+        <!-- Desktop Header -->
+        <header class="desktop-header d-none d-lg-block text-center mb-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="display-5 fw-bold text-primary">🎨 Meme Generator</h1>
+                <div class="dark-mode-toggle">
+                    <input type="checkbox" id="darkModeToggleDesktop" class="d-none">
+                    <label for="darkModeToggleDesktop" class="dark-mode-switch">
+                        <span class="sun">☀️</span>
+                        <span class="moon">🌙</span>
+                        <div class="toggle-circle"></div>
+                    </label>
+                </div>
+            </div>
+            <p class="text-muted mt-2">Create professional memes with drag & drop text</p>
+        </header>
+
+        <div class="row g-2">
+            <!-- Mobile Template Picker (Bottom Sheet) -->
+            <div class="col-12 d-block d-lg-none">
+                <div class="mobile-templates">
+                    <button class="btn btn-primary w-100 mb-2" onclick="toggleTemplateDrawer()">
+                        📁 Choose Template
+                    </button>
+                    <div class="template-drawer" id="templateDrawer">
+                        <div class="template-drawer-header">
+                            <h6 class="mb-0">Select Template</h6>
+                            <button class="btn-close" onclick="toggleTemplateDrawer()"></button>
+                        </div>
+                        <div class="template-drawer-content">
+                            <div class="template-search mb-2">
+                                <input type="text" class="form-control form-control-sm" placeholder="🔍 Search templates..." id="mobileTemplateSearch">
+                            </div>
+                            <div class="mobile-template-grid" id="mobileTemplateGrid">
+                                <!-- Mobile templates will be loaded here -->
+                            </div>
+                            <div class="upload-section mt-2">
+                                <input type="file" class="form-control form-control-sm mb-2" id="mobileUploadTemplate" accept="image/*">
+                                <button class="btn btn-outline-primary btn-sm w-100" onclick="addUserTemplateMobile()">Upload Image</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Left Panel - Controls (Desktop) -->
+            <div class="col-lg-3 d-none d-lg-block">
+                <div class="card shadow-sm sidebar-card">
                     <div class="card-body">
                         <h5 class="card-title">📁 Templates</h5>
                         
-                        <div class="template-search mb-2">
-                            <input type="text" id="templateSearch" class="form-control form-control-sm" placeholder="Search templates...">
+                        <div class="template-search mb-3">
+                            <input type="text" class="form-control form-control-sm" placeholder="🔍 Search templates..." id="templateSearch">
                         </div>
                         
-                        <div class="template-gallery mb-3">
-                            <div class="template-grid" id="templateGrid">
-                                <!-- Templates will be loaded here -->
+                        <div class="template-gallery">
+                            <div class="desktop-template-grid" id="desktopTemplateGrid">
+                                <!-- Desktop templates will be loaded here -->
                             </div>
                         </div>
 
-                        <div class="upload-section">
-                            <input type="file" id="uploadTemplate" class="form-control form-control-sm mb-2" accept="image/*">
-                            <button onclick="addUserTemplate()" class="btn btn-outline-primary btn-sm w-100">Upload Image</button>
+                        <div class="upload-section mt-3">
+                            <input type="file" class="form-control form-control-sm mb-2" id="uploadTemplate" accept="image/*">
+                            <button class="btn btn-outline-primary btn-sm w-100" onclick="addUserTemplate()">Upload Your Image</button>
                         </div>
                     </div>
                 </div>
 
-                <div class="card shadow-sm mt-3">
+                <div class="card shadow-sm sidebar-card mt-3">
                     <div class="card-body">
-                        <h5 class="card-title">✏️ Text Management</h5>
+                        <h5 class="card-title">✏️ Text Editor</h5>
                         
                         <div class="text-controls">
                             <div class="d-flex gap-2 mb-3">
-                                <button onclick="addTextArea()" class="btn btn-primary btn-sm flex-fill">+ Add Text Area</button>
-                                <button onclick="clearAllText()" class="btn btn-outline-danger btn-sm">Clear All</button>
+                                <button class="btn btn-primary btn-sm flex-fill" onclick="addTextArea()">
+                                    <i class="fas fa-plus"></i> Add Text
+                                </button>
+                                <button class="btn btn-outline-danger btn-sm" onclick="clearAllText()">
+                                    <i class="fas fa-trash"></i> Clear
+                                </button>
                             </div>
 
                             <div class="text-areas-container" id="textAreasContainer">
@@ -63,85 +110,183 @@
                             </div>
 
                             <div class="text-properties mt-3">
-                                <div class="row g-2">
-                                    <div class="col-6">
-                                        <label class="form-label">Font Size</label>
-                                        <input type="range" id="textSize" class="form-range" min="16" max="80" value="36">
-                                        <div class="text-center small" id="textSizeValue">36px</div>
-                                    </div>
-                                    <div class="col-6">
-                                        <label class="form-label">Stroke</label>
-                                        <input type="range" id="strokeWidth" class="form-range" min="0" max="8" value="3">
-                                        <div class="text-center small" id="strokeWidthValue">3px</div>
-                                    </div>
-                                    
+                                <div class="property-group">
+                                    <label class="form-label">Font Size</label>
+                                    <input type="range" class="form-range" id="textSize" min="20" max="80" value="36">
+                                    <div class="text-center small" id="textSizeValue">36px</div>
+                                </div>
+
+                                <div class="property-group">
+                                    <label class="form-label">Stroke Width</label>
+                                    <input type="range" class="form-range" id="strokeWidth" min="0" max="6" value="3">
+                                    <div class="text-center small" id="strokeWidthValue">3px</div>
+                                </div>
+
+                                <div class="row g-2 mt-2">
                                     <div class="col-6">
                                         <label class="form-label">Text Color</label>
-                                        <input type="color" id="textColor" class="form-control form-control-color" value="#ffffff">
+                                        <input type="color" class="form-control form-control-color" id="textColor" value="#ffffff">
                                     </div>
                                     <div class="col-6">
                                         <label class="form-label">Stroke Color</label>
-                                        <input type="color" id="strokeColor" class="form-control form-control-color" value="#000000">
+                                        <input type="color" class="form-control form-control-color" id="strokeColor" value="#000000">
                                     </div>
-                                    
+                                </div>
+
+                                <div class="row g-2 mt-2">
                                     <div class="col-12">
                                         <label class="form-label">Font Family</label>
-                                        <select id="fontFamily" class="form-select">
-                                            <option value="Impact">Impact</option>
+                                        <select class="form-select" id="fontFamily">
+                                            <option value="Impact">Impact (Classic)</option>
                                             <option value="Arial Black">Arial Black</option>
                                             <option value="Comic Sans MS">Comic Sans</option>
                                             <option value="Verdana">Verdana</option>
                                             <option value="Georgia">Georgia</option>
                                         </select>
                                     </div>
-
-                                    <div class="col-12">
-                                        <label class="form-label">Text Alignment</label>
-                                        <select id="textAlign" class="form-select">
-                                            <option value="center">Center</option>
-                                            <option value="left">Left</option>
-                                            <option value="right">Right</option>
-                                        </select>
-                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="d-grid gap-2 mt-3">
-                            <button onclick="updateCanvas()" class="btn btn-success">Update Canvas</button>
-                            <button onclick="downloadMeme()" class="btn btn-primary">💾 Download Meme</button>
+                        <div class="action-buttons mt-3">
+                            <button class="btn btn-success w-100 mb-2" onclick="updateCanvas()">
+                                <i class="fas fa-sync"></i> Update Meme
+                            </button>
+                            <button class="btn btn-primary w-100" onclick="downloadMeme()">
+                                <i class="fas fa-download"></i> Download Meme
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Right Panel - Canvas -->
-            <div class="col-lg-8">
-                <div class="card shadow-sm">
-                    <div class="card-body text-center">
-                        <div class="canvas-container position-relative">
+            <!-- Main Canvas Area -->
+            <div class="col-lg-9 col-12">
+                <div class="card shadow-sm main-canvas-card">
+                    <div class="card-body p-2">
+                        <div class="canvas-container" id="canvasContainer">
                             <canvas id="memeCanvas"></canvas>
                             <div class="canvas-overlay" id="canvasOverlay">
                                 <!-- Text areas will be positioned here -->
                             </div>
-                            <div class="canvas-controls">
-                                <div class="zoom-controls">
-                                    <button class="btn btn-sm btn-outline-secondary" onclick="zoomOut()">−</button>
-                                    <span class="zoom-value" id="zoomValue">100%</span>
-                                    <button class="btn btn-sm btn-outline-secondary" onclick="zoomIn()">+</button>
+                            
+                            <!-- Mobile Controls -->
+                            <div class="mobile-controls d-flex d-lg-none">
+                                <div class="mobile-control-group">
+                                    <button class="btn btn-sm btn-outline-primary" onclick="addTextArea()">
+                                        <i class="fas fa-plus"></i> Text
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-secondary" onclick="zoomOut()">
+                                        <i class="fas fa-search-minus"></i>
+                                    </button>
+                                    <span class="zoom-value" id="mobileZoomValue">100%</span>
+                                    <button class="btn btn-sm btn-outline-secondary" onclick="zoomIn()">
+                                        <i class="fas fa-search-plus"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-success" onclick="downloadMeme()">
+                                        <i class="fas fa-download"></i>
+                                    </button>
                                 </div>
-                                <button class="btn btn-sm btn-outline-secondary" onclick="resetZoom()">Reset</button>
+                            </div>
+
+                            <!-- Desktop Controls -->
+                            <div class="desktop-controls d-none d-lg-flex">
+                                <div class="control-group">
+                                    <button class="btn btn-sm btn-outline-secondary" onclick="zoomOut()">−</button>
+                                    <span class="zoom-value" id="desktopZoomValue">100%</span>
+                                    <button class="btn btn-sm btn-outline-secondary" onclick="zoomIn()">+</button>
+                                    <button class="btn btn-sm btn-outline-secondary" onclick="resetZoom()">Reset</button>
+                                </div>
                             </div>
                         </div>
-                        <div class="canvas-instructions mt-2">
+                        
+                        <!-- Mobile Instructions -->
+                        <div class="mobile-instructions d-block d-lg-none text-center mt-2">
                             <small class="text-muted">
-                                📱 <strong>Mobile:</strong> Drag text areas • Pinch to zoom<br>
-                                💻 <strong>Desktop:</strong> Drag text areas • Scroll to zoom
+                                👆 Drag text to move • 📱 Pinch to zoom
+                            </small>
+                        </div>
+
+                        <!-- Desktop Instructions -->
+                        <div class="desktop-instructions d-none d-lg-block text-center mt-2">
+                            <small class="text-muted">
+                                💡 Drag text areas to reposition • Scroll to zoom • Right-click to pan
                             </small>
                         </div>
                     </div>
                 </div>
+
+                <!-- Mobile Text Properties Panel -->
+                <div class="mobile-text-panel d-block d-lg-none mt-2">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <div class="text-properties-mobile">
+                                <div class="row g-2">
+                                    <div class="col-4">
+                                        <label class="form-label small">Size</label>
+                                        <input type="range" class="form-range" id="mobileTextSize" min="20" max="80" value="36">
+                                        <div class="text-center x-small" id="mobileTextSizeValue">36px</div>
+                                    </div>
+                                    <div class="col-4">
+                                        <label class="form-label small">Stroke</label>
+                                        <input type="range" class="form-range" id="mobileStrokeWidth" min="0" max="6" value="3">
+                                        <div class="text-center x-small" id="mobileStrokeWidthValue">3px</div>
+                                    </div>
+                                    <div class="col-4">
+                                        <label class="form-label small">Font</label>
+                                        <select class="form-select form-select-sm" id="mobileFontFamily">
+                                            <option value="Impact">Impact</option>
+                                            <option value="Arial Black">Arial</option>
+                                            <option value="Comic Sans MS">Comic</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label small">Text Color</label>
+                                        <input type="color" class="form-control form-control-color form-control-sm" id="mobileTextColor" value="#ffffff">
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label small">Stroke Color</label>
+                                        <input type="color" class="form-control form-control-color form-control-sm" id="mobileStrokeColor" value="#000000">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="mobile-nav d-flex d-lg-none">
+        <button class="nav-btn active" onclick="showSection('templates')">
+            <i class="fas fa-images"></i>
+            <span>Templates</span>
+        </button>
+        <button class="nav-btn" onclick="showSection('text')">
+            <i class="fas fa-font"></i>
+            <span>Text</span>
+        </button>
+        <button class="nav-btn" onclick="showSection('style')">
+            <i class="fas fa-palette"></i>
+            <span>Style</span>
+        </button>
+        <button class="nav-btn" onclick="downloadMeme()">
+            <i class="fas fa-download"></i>
+            <span>Download</span>
+        </button>
+    </nav>
+
+    <!-- Mobile Sections -->
+    <div class="mobile-sections">
+        <div class="mobile-section" id="templatesSection">
+            <!-- Template content will be loaded here -->
+        </div>
+        <div class="mobile-section" id="textSection" style="display: none;">
+            <!-- Text content will be loaded here -->
+        </div>
+        <div class="mobile-section" id="styleSection" style="display: none;">
+            <!-- Style content will be loaded here -->
         </div>
     </div>
 
@@ -166,16 +311,60 @@
                 this.dragOffsetY = 0;
                 this.startPanX = 0;
                 this.startPanY = 0;
+                this.templateDrawerOpen = false;
                 
+                // High-quality meme templates with better images
                 this.memeTemplates = [
-                    { name: "Drake", url: "https://i.imgflip.com/30b1gx.jpg" },
-                    { name: "Doge", url: "https://i.imgflip.com/4t0m5.jpg" },
-                    { name: "Two Buttons", url: "https://i.imgflip.com/1g8my4.jpg" },
-                    { name: "Distracted BF", url: "https://i.imgflip.com/1ur9b0.jpg" },
-                    { name: "Change My Mind", url: "https://i.imgflip.com/24y43o.jpg" },
-                    { name: "Woman Yelling", url: "https://i.imgflip.com/345v97.jpg" },
-                    { name: "Left Exit 12", url: "https://i.imgflip.com/22bdq6.jpg" },
-                    { name: "Running Balloon", url: "https://i.imgflip.com/261o3j.jpg" }
+                    { 
+                        name: "Drake", 
+                        url: "https://i.imgflip.com/30b1gx.jpg",
+                        category: "popular"
+                    },
+                    { 
+                        name: "Doge", 
+                        url: "https://i.imgflip.com/4t0m5.jpg",
+                        category: "animals"
+                    },
+                    { 
+                        name: "Two Buttons", 
+                        url: "https://i.imgflip.com/1g8my4.jpg",
+                        category: "popular"
+                    },
+                    { 
+                        name: "Distracted Boyfriend", 
+                        url: "https://i.imgflip.com/1ur9b0.jpg",
+                        category: "popular"
+                    },
+                    { 
+                        name: "Change My Mind", 
+                        url: "https://i.imgflip.com/24y43o.jpg",
+                        category: "debate"
+                    },
+                    { 
+                        name: "Woman Yelling at Cat", 
+                        url: "https://i.imgflip.com/345v97.jpg",
+                        category: "animals"
+                    },
+                    { 
+                        name: "Left Exit 12", 
+                        url: "https://i.imgflip.com/22bdq6.jpg",
+                        category: "driving"
+                    },
+                    { 
+                        name: "Running Away Balloon", 
+                        url: "https://i.imgflip.com/261o3j.jpg",
+                        category: "escape"
+                    },
+                    { 
+                        name: "Winnie the Pooh", 
+                        url: "https://i.imgflip.com/2ybua0.jpg",
+                        category: "popular"
+                    },
+                    { 
+                        name: "Mocking Spongebob", 
+                        url: "https://i.imgflip.com/1otk96.jpg",
+                        category: "mock"
+                    }
                 ];
                 
                 this.userTemplates = JSON.parse(localStorage.getItem('userTemplates')) || [];
@@ -186,58 +375,87 @@
             init() {
                 this.setupDarkMode();
                 this.setupEventListeners();
-                this.initializeTemplateGallery();
+                this.initializeTemplateGalleries();
                 this.loadImage(this.memeTemplates[0].url);
                 this.addDefaultTextAreas();
                 this.updateZoomDisplay();
+                this.setupMobileNavigation();
             }
 
             setupDarkMode() {
-                const darkModeToggle = document.getElementById('darkModeToggle');
-                const savedMode = localStorage.getItem('darkMode');
-                
-                if (savedMode === 'enabled') {
-                    darkModeToggle.checked = true;
-                    document.body.classList.add('dark-mode');
-                }
-                
-                darkModeToggle.addEventListener('change', (e) => {
-                    if (e.target.checked) {
+                const setupToggle = (toggleId) => {
+                    const toggle = document.getElementById(toggleId);
+                    if (!toggle) return;
+                    
+                    const savedMode = localStorage.getItem('darkMode');
+                    if (savedMode === 'enabled') {
+                        toggle.checked = true;
                         document.body.classList.add('dark-mode');
-                        localStorage.setItem('darkMode', 'enabled');
-                    } else {
-                        document.body.classList.remove('dark-mode');
-                        localStorage.setItem('darkMode', 'disabled');
                     }
-                });
+                    
+                    toggle.addEventListener('change', (e) => {
+                        if (e.target.checked) {
+                            document.body.classList.add('dark-mode');
+                            localStorage.setItem('darkMode', 'enabled');
+                        } else {
+                            document.body.classList.remove('dark-mode');
+                            localStorage.setItem('darkMode', 'disabled');
+                        }
+                    });
+                };
+
+                setupToggle('darkModeToggle');
+                setupToggle('darkModeToggleDesktop');
             }
 
             setupEventListeners() {
-                // Text controls
-                document.getElementById('textSize').addEventListener('input', (e) => {
+                // Text controls - Desktop
+                document.getElementById('textSize')?.addEventListener('input', (e) => {
                     document.getElementById('textSizeValue').textContent = e.target.value + 'px';
                     this.updateAllTextAreas();
                 });
 
-                document.getElementById('strokeWidth').addEventListener('input', (e) => {
+                document.getElementById('strokeWidth')?.addEventListener('input', (e) => {
                     document.getElementById('strokeWidthValue').textContent = e.target.value + 'px';
                     this.updateAllTextAreas();
                 });
 
-                document.getElementById('textColor').addEventListener('input', () => this.updateAllTextAreas());
-                document.getElementById('strokeColor').addEventListener('input', () => this.updateAllTextAreas());
-                document.getElementById('fontFamily').addEventListener('change', () => this.updateAllTextAreas());
-                document.getElementById('textAlign').addEventListener('change', () => this.updateAllTextAreas());
+                document.getElementById('textColor')?.addEventListener('input', () => this.updateAllTextAreas());
+                document.getElementById('strokeColor')?.addEventListener('input', () => this.updateAllTextAreas());
+                document.getElementById('fontFamily')?.addEventListener('change', () => this.updateAllTextAreas());
+
+                // Text controls - Mobile
+                document.getElementById('mobileTextSize')?.addEventListener('input', (e) => {
+                    document.getElementById('mobileTextSizeValue').textContent = e.target.value + 'px';
+                    this.updateAllTextAreas();
+                });
+
+                document.getElementById('mobileStrokeWidth')?.addEventListener('input', (e) => {
+                    document.getElementById('mobileStrokeWidthValue').textContent = e.target.value + 'px';
+                    this.updateAllTextAreas();
+                });
+
+                document.getElementById('mobileTextColor')?.addEventListener('input', () => this.updateAllTextAreas());
+                document.getElementById('mobileStrokeColor')?.addEventListener('input', () => this.updateAllTextAreas());
+                document.getElementById('mobileFontFamily')?.addEventListener('change', () => this.updateAllTextAreas());
 
                 // Template search
-                document.getElementById('templateSearch').addEventListener('input', (e) => {
-                    this.filterTemplates(e.target.value.toLowerCase());
+                document.getElementById('templateSearch')?.addEventListener('input', (e) => {
+                    this.filterTemplates(e.target.value.toLowerCase(), 'desktop');
+                });
+
+                document.getElementById('mobileTemplateSearch')?.addEventListener('input', (e) => {
+                    this.filterTemplates(e.target.value.toLowerCase(), 'mobile');
                 });
 
                 // Canvas interactions
                 this.canvas.addEventListener('wheel', (e) => this.handleZoom(e));
                 this.canvas.addEventListener('mousedown', (e) => this.startPan(e));
                 this.canvas.addEventListener('touchstart', (e) => this.startPanTouch(e), { passive: false });
+
+                // Touch events for mobile
+                this.canvas.addEventListener('touchmove', (e) => this.handleTouchMove(e), { passive: false });
+                this.canvas.addEventListener('touchend', () => this.handleTouchEnd());
 
                 // Window resize
                 window.addEventListener('resize', () => {
@@ -246,59 +464,112 @@
                         this.updateAllTextAreas();
                     }
                 });
+
+                // Prevent pull-to-refresh on mobile
+                document.addEventListener('touchmove', (e) => {
+                    if (this.isDragging || this.isPanning) {
+                        e.preventDefault();
+                    }
+                }, { passive: false });
             }
 
-            initializeTemplateGallery() {
-                const templateGrid = document.getElementById('templateGrid');
-                const allTemplates = [...this.memeTemplates, ...this.userTemplates];
-                
-                allTemplates.forEach((template, index) => {
-                    const templateItem = document.createElement('div');
-                    templateItem.className = `template-item ${index === 0 ? 'active' : ''}`;
-                    templateItem.innerHTML = `
-                        <img src="${template.url}" alt="${template.name}" class="template-img" loading="lazy">
-                        <span class="template-name">${template.name}</span>
-                    `;
-                    
-                    templateItem.addEventListener('click', () => {
-                        document.querySelectorAll('.template-item').forEach(item => item.classList.remove('active'));
-                        templateItem.classList.add('active');
-                        this.loadImage(template.url);
+            setupMobileNavigation() {
+                // Setup mobile bottom nav
+                const navButtons = document.querySelectorAll('.mobile-nav .nav-btn');
+                navButtons.forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        navButtons.forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
                     });
-                    
-                    templateGrid.appendChild(templateItem);
                 });
             }
 
-            filterTemplates(searchTerm) {
+            initializeTemplateGalleries() {
+                this.loadTemplatesToGrid('desktop');
+                this.loadTemplatesToGrid('mobile');
+            }
+
+            loadTemplatesToGrid(type) {
+                const gridId = type === 'mobile' ? 'mobileTemplateGrid' : 'desktopTemplateGrid';
+                const grid = document.getElementById(gridId);
+                if (!grid) return;
+
+                const allTemplates = [...this.memeTemplates, ...this.userTemplates];
+                
+                grid.innerHTML = '';
+                
+                allTemplates.forEach((template, index) => {
+                    const templateItem = document.createElement('div');
+                    templateItem.className = `template-item ${type}-template-item ${index === 0 ? 'active' : ''}`;
+                    templateItem.innerHTML = `
+                        <div class="template-image-container">
+                            <img src="${template.url}" alt="${template.name}" class="template-img" loading="lazy">
+                            <div class="template-overlay">
+                                <span class="template-name">${template.name}</span>
+                            </div>
+                        </div>
+                    `;
+                    
+                    templateItem.addEventListener('click', () => {
+                        // Remove active class from all items
+                        document.querySelectorAll(`.${type}-template-item`).forEach(item => {
+                            item.classList.remove('active');
+                        });
+                        templateItem.classList.add('active');
+                        this.loadImage(template.url);
+                        
+                        // Close mobile drawer if open
+                        if (type === 'mobile') {
+                            this.toggleTemplateDrawer(false);
+                        }
+                    });
+                    
+                    grid.appendChild(templateItem);
+                });
+            }
+
+            filterTemplates(searchTerm, type) {
                 const allTemplates = [...this.memeTemplates, ...this.userTemplates];
                 const filteredTemplates = allTemplates.filter(template => 
                     template.name.toLowerCase().includes(searchTerm)
                 );
                 
-                const templateGrid = document.getElementById('templateGrid');
-                templateGrid.innerHTML = '';
+                const gridId = type === 'mobile' ? 'mobileTemplateGrid' : 'desktopTemplateGrid';
+                const grid = document.getElementById(gridId);
+                if (!grid) return;
+                
+                grid.innerHTML = '';
                 
                 if (filteredTemplates.length === 0) {
-                    templateGrid.innerHTML = '<div class="no-templates">No templates found</div>';
+                    grid.innerHTML = '<div class="no-templates">No templates found for "' + searchTerm + '"</div>';
                     return;
                 }
                 
                 filteredTemplates.forEach((template, index) => {
                     const templateItem = document.createElement('div');
-                    templateItem.className = `template-item ${index === 0 ? 'active' : ''}`;
+                    templateItem.className = `template-item ${type}-template-item ${index === 0 ? 'active' : ''}`;
                     templateItem.innerHTML = `
-                        <img src="${template.url}" alt="${template.name}" class="template-img">
-                        <span class="template-name">${template.name}</span>
+                        <div class="template-image-container">
+                            <img src="${template.url}" alt="${template.name}" class="template-img">
+                            <div class="template-overlay">
+                                <span class="template-name">${template.name}</span>
+                            </div>
+                        </div>
                     `;
                     
                     templateItem.addEventListener('click', () => {
-                        document.querySelectorAll('.template-item').forEach(item => item.classList.remove('active'));
+                        document.querySelectorAll(`.${type}-template-item`).forEach(item => {
+                            item.classList.remove('active');
+                        });
                         templateItem.classList.add('active');
                         this.loadImage(template.url);
+                        
+                        if (type === 'mobile') {
+                            this.toggleTemplateDrawer(false);
+                        }
                     });
                     
-                    templateGrid.appendChild(templateItem);
+                    grid.appendChild(templateItem);
                 });
             }
 
@@ -323,28 +594,35 @@
             }
 
             updateCanvasSize() {
-                const container = this.canvas.parentElement;
-                const maxWidth = Math.min(800, container.clientWidth - 40);
-                const scale = maxWidth / this.currentImage.width;
+                const container = document.getElementById('canvasContainer');
+                const maxWidth = container.clientWidth - 40;
+                const maxHeight = window.innerHeight * 0.6;
+                
+                let scale = maxWidth / this.currentImage.width;
+                if (this.currentImage.height * scale > maxHeight) {
+                    scale = maxHeight / this.currentImage.height;
+                }
                 
                 this.canvas.width = this.currentImage.width * scale;
                 this.canvas.height = this.currentImage.height * scale;
+                
+                // Update overlay size
+                this.canvasOverlay.style.width = this.canvas.width + 'px';
+                this.canvasOverlay.style.height = this.canvas.height + 'px';
             }
 
             addDefaultTextAreas() {
-                this.addTextArea("TOP TEXT", 50, 15);
-                this.addTextArea("BOTTOM TEXT", 50, 85);
+                this.addTextArea("TOP TEXT", 50, 20);
+                this.addTextArea("BOTTOM TEXT", 50, 80);
             }
 
-            addTextArea(text = "NEW TEXT", x = 50, y = 50) {
+            addTextArea(text = "YOUR TEXT", x = 50, y = 50) {
                 const id = 'text_' + Date.now();
                 const textArea = {
                     id,
                     text,
                     x,
-                    y,
-                    width: 200,
-                    height: 60
+                    y
                 };
                 
                 this.textAreas.push(textArea);
@@ -364,19 +642,16 @@
                     </div>
                 `;
                 
-                // Position text area
                 this.updateTextAreaPosition(textElement, textArea);
-                
-                // Style text area
                 this.updateTextAreaStyle(textElement);
-                
-                // Add drag functionality
                 this.setupTextAreaDrag(textElement, textArea);
                 
                 this.canvasOverlay.appendChild(textElement);
             }
 
             createTextAreaControl(textArea) {
+                if (!this.textAreasContainer) return;
+                
                 const control = document.createElement('div');
                 control.className = 'text-area-control';
                 control.innerHTML = `
@@ -395,82 +670,80 @@
 
             setupTextAreaDrag(textElement, textArea) {
                 const dragHandle = textElement.querySelector('.handle.drag');
+                const textContent = textElement.querySelector('.text-content');
                 
-                const startDrag = (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    
-                    this.isDragging = true;
-                    this.currentDragElement = textArea;
-                    
-                    const rect = textElement.getBoundingClientRect();
-                    const canvasRect = this.canvas.getBoundingClientRect();
-                    
-                    this.dragOffsetX = e.clientX - rect.left;
-                    this.dragOffsetY = e.clientY - rect.top;
-                    
-                    document.addEventListener('mousemove', drag);
-                    document.addEventListener('mouseup', stopDrag);
-                };
+                // Make entire text area draggable on mobile
+                if (window.innerWidth < 992) {
+                    textContent.style.cursor = 'move';
+                    textContent.addEventListener('touchstart', (e) => this.startTextDrag(e, textElement, textArea));
+                }
+                
+                dragHandle.addEventListener('mousedown', (e) => this.startTextDrag(e, textElement, textArea));
+                dragHandle.addEventListener('touchstart', (e) => this.startTextDrag(e, textElement, textArea), { passive: false });
+            }
 
-                const startDragTouch = (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    
-                    this.isDragging = true;
-                    this.currentDragElement = textArea;
-                    
+            startTextDrag(e, textElement, textArea) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                this.isDragging = true;
+                this.currentDragElement = textArea;
+                
+                const rect = textElement.getBoundingClientRect();
+                const canvasRect = this.canvas.getBoundingClientRect();
+                
+                if (e.type === 'touchstart') {
                     const touch = e.touches[0];
-                    const rect = textElement.getBoundingClientRect();
-                    const canvasRect = this.canvas.getBoundingClientRect();
-                    
                     this.dragOffsetX = touch.clientX - rect.left;
                     this.dragOffsetY = touch.clientY - rect.top;
                     
-                    document.addEventListener('touchmove', dragTouch, { passive: false });
-                    document.addEventListener('touchend', stopDrag);
-                };
+                    document.addEventListener('touchmove', this.dragText.bind(this));
+                    document.addEventListener('touchend', this.stopTextDrag.bind(this));
+                } else {
+                    this.dragOffsetX = e.clientX - rect.left;
+                    this.dragOffsetY = e.clientY - rect.top;
+                    
+                    document.addEventListener('mousemove', this.dragText.bind(this));
+                    document.addEventListener('mouseup', this.stopTextDrag.bind(this));
+                }
+            }
 
-                const drag = (e) => {
-                    if (!this.isDragging || this.currentDragElement !== textArea) return;
-                    
-                    const canvasRect = this.canvas.getBoundingClientRect();
-                    const x = ((e.clientX - this.dragOffsetX - canvasRect.left + textElement.offsetWidth / 2) / canvasRect.width) * 100;
-                    const y = ((e.clientY - this.dragOffsetY - canvasRect.top + textElement.offsetHeight / 2) / canvasRect.height) * 100;
-                    
-                    textArea.x = Math.max(2, Math.min(98, x));
-                    textArea.y = Math.max(2, Math.min(98, y));
-                    
-                    this.updateTextAreaPosition(textElement, textArea);
-                };
-
-                const dragTouch = (e) => {
-                    if (!this.isDragging || this.currentDragElement !== textArea) return;
+            dragText(e) {
+                if (!this.isDragging || !this.currentDragElement) return;
+                
+                let clientX, clientY;
+                
+                if (e.type === 'touchmove') {
                     e.preventDefault();
-                    
-                    const touch = e.touches[0];
-                    const canvasRect = this.canvas.getBoundingClientRect();
-                    const x = ((touch.clientX - this.dragOffsetX - canvasRect.left + textElement.offsetWidth / 2) / canvasRect.width) * 100;
-                    const y = ((touch.clientY - this.dragOffsetY - canvasRect.top + textElement.offsetHeight / 2) / canvasRect.height) * 100;
-                    
-                    textArea.x = Math.max(2, Math.min(98, x));
-                    textArea.y = Math.max(2, Math.min(98, y));
-                    
-                    this.updateTextAreaPosition(textElement, textArea);
-                };
+                    clientX = e.touches[0].clientX;
+                    clientY = e.touches[0].clientY;
+                } else {
+                    clientX = e.clientX;
+                    clientY = e.clientY;
+                }
+                
+                const canvasRect = this.canvas.getBoundingClientRect();
+                const textElement = document.getElementById(`text-${this.currentDragElement.id}`);
+                
+                if (!textElement) return;
+                
+                const x = ((clientX - this.dragOffsetX - canvasRect.left + textElement.offsetWidth / 2) / canvasRect.width) * 100;
+                const y = ((clientY - this.dragOffsetY - canvasRect.top + textElement.offsetHeight / 2) / canvasRect.height) * 100;
+                
+                this.currentDragElement.x = Math.max(5, Math.min(95, x));
+                this.currentDragElement.y = Math.max(5, Math.min(95, y));
+                
+                this.updateTextAreaPosition(textElement, this.currentDragElement);
+            }
 
-                const stopDrag = () => {
-                    this.isDragging = false;
-                    this.currentDragElement = null;
-                    document.removeEventListener('mousemove', drag);
-                    document.removeEventListener('touchmove', dragTouch);
-                    document.removeEventListener('mouseup', stopDrag);
-                    document.removeEventListener('touchend', stopDrag);
-                    this.updateCanvas();
-                };
-
-                dragHandle.addEventListener('mousedown', startDrag);
-                dragHandle.addEventListener('touchstart', startDragTouch, { passive: false });
+            stopTextDrag() {
+                this.isDragging = false;
+                this.currentDragElement = null;
+                document.removeEventListener('mousemove', this.dragText);
+                document.removeEventListener('touchmove', this.dragText);
+                document.removeEventListener('mouseup', this.stopTextDrag);
+                document.removeEventListener('touchend', this.stopTextDrag);
+                this.updateCanvas();
             }
 
             updateTextAreaPosition(textElement, textArea) {
@@ -483,11 +756,11 @@
             }
 
             updateTextAreaStyle(textElement) {
-                const textSize = document.getElementById('textSize').value;
-                const strokeWidth = document.getElementById('strokeWidth').value;
-                const textColor = document.getElementById('textColor').value;
-                const strokeColor = document.getElementById('strokeColor').value;
-                const fontFamily = document.getElementById('fontFamily').value;
+                const textSize = this.getTextSize();
+                const strokeWidth = this.getStrokeWidth();
+                const textColor = this.getTextColor();
+                const strokeColor = this.getStrokeColor();
+                const fontFamily = this.getFontFamily();
                 
                 textElement.style.fontSize = textSize + 'px';
                 textElement.style.color = textColor;
@@ -498,6 +771,31 @@
                     ${strokeWidth}px -${strokeWidth}px 0 ${strokeColor},
                     -${strokeWidth}px ${strokeWidth}px 0 ${strokeColor}
                 `;
+            }
+
+            getTextSize() {
+                return document.getElementById('mobileTextSize')?.value || 
+                       document.getElementById('textSize')?.value || 36;
+            }
+
+            getStrokeWidth() {
+                return document.getElementById('mobileStrokeWidth')?.value || 
+                       document.getElementById('strokeWidth')?.value || 3;
+            }
+
+            getTextColor() {
+                return document.getElementById('mobileTextColor')?.value || 
+                       document.getElementById('textColor')?.value || '#ffffff';
+            }
+
+            getStrokeColor() {
+                return document.getElementById('mobileStrokeColor')?.value || 
+                       document.getElementById('strokeColor')?.value || '#000000';
+            }
+
+            getFontFamily() {
+                return document.getElementById('mobileFontFamily')?.value || 
+                       document.getElementById('fontFamily')?.value || 'Impact';
             }
 
             updateTextAreaText(id, newText) {
@@ -530,12 +828,14 @@
                 if (textElement) textElement.remove();
                 
                 // Remove control
-                const controls = this.textAreasContainer.querySelectorAll('.text-area-control');
-                controls.forEach(control => {
-                    if (control.querySelector(`[oninput*="${id}"]`)) {
-                        control.remove();
-                    }
-                });
+                if (this.textAreasContainer) {
+                    const controls = this.textAreasContainer.querySelectorAll('.text-area-control');
+                    controls.forEach(control => {
+                        if (control.querySelector(`[oninput*="${id}"]`)) {
+                            control.remove();
+                        }
+                    });
+                }
                 
                 this.updateCanvas();
             }
@@ -544,7 +844,9 @@
                 if (confirm('Are you sure you want to remove all text areas?')) {
                     this.textAreas = [];
                     this.canvasOverlay.innerHTML = '';
-                    this.textAreasContainer.innerHTML = '';
+                    if (this.textAreasContainer) {
+                        this.textAreasContainer.innerHTML = '';
+                    }
                     this.updateCanvas();
                 }
             }
@@ -555,13 +857,49 @@
                 const wheel = e.deltaY < 0 ? 1 : -1;
                 const zoom = Math.exp(wheel * zoomIntensity);
                 
-                this.canvasScale = Math.max(0.5, Math.min(3, this.canvasScale * zoom));
+                this.canvasScale = Math.max(0.3, Math.min(3, this.canvasScale * zoom));
                 this.updateZoomDisplay();
                 this.updateCanvas();
             }
 
+            handleTouchMove(e) {
+                if (e.touches.length === 2) {
+                    // Handle pinch to zoom
+                    e.preventDefault();
+                    this.handlePinchZoom(e);
+                } else if (this.isPanning && e.touches.length === 1) {
+                    // Handle panning
+                    e.preventDefault();
+                    this.panTouch(e);
+                }
+            }
+
+            handlePinchZoom(e) {
+                const touch1 = e.touches[0];
+                const touch2 = e.touches[1];
+                
+                const currentDistance = Math.hypot(
+                    touch1.clientX - touch2.clientX,
+                    touch1.clientY - touch2.clientY
+                );
+                
+                if (this.lastPinchDistance) {
+                    const zoom = currentDistance / this.lastPinchDistance;
+                    this.canvasScale = Math.max(0.3, Math.min(3, this.canvasScale * zoom));
+                    this.updateZoomDisplay();
+                    this.updateCanvas();
+                }
+                
+                this.lastPinchDistance = currentDistance;
+            }
+
+            handleTouchEnd() {
+                this.lastPinchDistance = null;
+                this.stopPan();
+            }
+
             startPan(e) {
-                if (e.button !== 0) return; // Only left mouse button
+                if (e.button !== 0 || this.isDragging) return;
                 this.isPanning = true;
                 this.startPanX = e.clientX - this.canvasOffsetX;
                 this.startPanY = e.clientY - this.canvasOffsetY;
@@ -572,7 +910,7 @@
             }
 
             startPanTouch(e) {
-                if (e.touches.length === 1) {
+                if (e.touches.length === 1 && !this.isDragging) {
                     this.isPanning = true;
                     this.startPanX = e.touches[0].clientX - this.canvasOffsetX;
                     this.startPanY = e.touches[0].clientY - this.canvasOffsetY;
@@ -615,7 +953,7 @@
             }
 
             zoomOut() {
-                this.canvasScale = Math.max(0.5, this.canvasScale - 0.2);
+                this.canvasScale = Math.max(0.3, this.canvasScale - 0.2);
                 this.updateZoomDisplay();
                 this.updateCanvas();
             }
@@ -629,7 +967,9 @@
             }
 
             updateZoomDisplay() {
-                document.getElementById('zoomValue').textContent = Math.round(this.canvasScale * 100) + '%';
+                const zoomValue = Math.round(this.canvasScale * 100) + '%';
+                document.getElementById('mobileZoomValue').textContent = zoomValue;
+                document.getElementById('desktopZoomValue').textContent = zoomValue;
             }
 
             updateCanvas() {
@@ -646,12 +986,11 @@
                 this.ctx.drawImage(this.currentImage, 0, 0, this.canvas.width, this.canvas.height);
                 
                 // Draw text areas
-                const textSize = document.getElementById('textSize').value;
-                const strokeWidth = document.getElementById('strokeWidth').value;
-                const textColor = document.getElementById('textColor').value;
-                const strokeColor = document.getElementById('strokeColor').value;
-                const fontFamily = document.getElementById('fontFamily').value;
-                const textAlign = document.getElementById('textAlign').value;
+                const textSize = this.getTextSize();
+                const strokeWidth = this.getStrokeWidth();
+                const textColor = this.getTextColor();
+                const strokeColor = this.getStrokeColor();
+                const fontFamily = this.getFontFamily();
                 
                 this.textAreas.forEach(textArea => {
                     if (!textArea.text) return;
@@ -660,7 +999,7 @@
                     this.ctx.fillStyle = textColor;
                     this.ctx.strokeStyle = strokeColor;
                     this.ctx.lineWidth = strokeWidth;
-                    this.ctx.textAlign = textAlign;
+                    this.ctx.textAlign = 'center';
                     this.ctx.textBaseline = 'middle';
                     
                     const x = (textArea.x / 100) * this.canvas.width;
@@ -696,12 +1035,11 @@
                 tempCtx.drawImage(this.currentImage, 0, 0, tempCanvas.width, tempCanvas.height);
                 
                 // Scale text properties
-                const textSize = parseInt(document.getElementById('textSize').value);
-                const strokeWidth = parseInt(document.getElementById('strokeWidth').value);
-                const textColor = document.getElementById('textColor').value;
-                const strokeColor = document.getElementById('strokeColor').value;
-                const fontFamily = document.getElementById('fontFamily').value;
-                const textAlign = document.getElementById('textAlign').value;
+                const textSize = parseInt(this.getTextSize());
+                const strokeWidth = parseInt(this.getStrokeWidth());
+                const textColor = this.getTextColor();
+                const strokeColor = this.getStrokeColor();
+                const fontFamily = this.getFontFamily();
                 
                 const scaleFactor = tempCanvas.width / this.canvas.width;
                 const scaledTextSize = textSize * scaleFactor;
@@ -715,7 +1053,7 @@
                     tempCtx.fillStyle = textColor;
                     tempCtx.strokeStyle = strokeColor;
                     tempCtx.lineWidth = scaledStrokeWidth;
-                    tempCtx.textAlign = textAlign;
+                    tempCtx.textAlign = 'center';
                     tempCtx.textBaseline = 'middle';
                     
                     const x = (textArea.x / 100) * tempCanvas.width;
@@ -734,9 +1072,31 @@
                 link.click();
             }
 
+            toggleTemplateDrawer(show) {
+                const drawer = document.getElementById('templateDrawer');
+                if (show === undefined) {
+                    this.templateDrawerOpen = !this.templateDrawerOpen;
+                } else {
+                    this.templateDrawerOpen = show;
+                }
+                
+                if (drawer) {
+                    drawer.classList.toggle('show', this.templateDrawerOpen);
+                }
+            }
+
             addUserTemplate() {
                 const fileInput = document.getElementById('uploadTemplate');
-                const file = fileInput.files[0];
+                this.handleFileUpload(fileInput);
+            }
+
+            addUserTemplateMobile() {
+                const fileInput = document.getElementById('mobileUploadTemplate');
+                this.handleFileUpload(fileInput);
+            }
+
+            handleFileUpload(fileInput) {
+                const file = fileInput?.files[0];
                 
                 if (!file) {
                     alert('Please select an image file');
@@ -748,17 +1108,17 @@
                     const name = file.name.split('.')[0] || 'Custom Template';
                     const newTemplate = {
                         name: name,
-                        url: e.target.result
+                        url: e.target.result,
+                        category: 'custom'
                     };
                     
                     this.userTemplates.push(newTemplate);
                     localStorage.setItem('userTemplates', JSON.stringify(this.userTemplates));
                     
-                    // Reload template gallery
-                    document.getElementById('templateGrid').innerHTML = '';
-                    this.initializeTemplateGallery();
+                    // Reload template galleries
+                    this.initializeTemplateGalleries();
                     
-                    fileInput.value = '';
+                    if (fileInput) fileInput.value = '';
                     alert('Template added successfully!');
                 };
                 reader.readAsDataURL(file);
@@ -786,6 +1146,10 @@
             memeGenerator.addUserTemplate();
         }
 
+        function addUserTemplateMobile() {
+            memeGenerator.addUserTemplateMobile();
+        }
+
         function zoomIn() {
             memeGenerator.zoomIn();
         }
@@ -798,11 +1162,41 @@
             memeGenerator.resetZoom();
         }
 
+        function toggleTemplateDrawer() {
+            memeGenerator.toggleTemplateDrawer();
+        }
+
+        function showSection(section) {
+            // Hide all sections
+            document.querySelectorAll('.mobile-section').forEach(s => {
+                s.style.display = 'none';
+            });
+            
+            // Show selected section
+            const sectionEl = document.getElementById(section + 'Section');
+            if (sectionEl) {
+                sectionEl.style.display = 'block';
+            }
+        }
+
         // Initialize the application
         let memeGenerator;
         document.addEventListener('DOMContentLoaded', () => {
             memeGenerator = new MemeGenerator();
         });
+
+        // Prevent pull-to-refresh on mobile
+        document.addEventListener('touchmove', function(e) {
+            if (e.touches.length > 1) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        // Add Font Awesome for icons
+        const faLink = document.createElement('link');
+        faLink.rel = 'stylesheet';
+        faLink.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css';
+        document.head.appendChild(faLink);
     </script>
 </body>
 </html>
