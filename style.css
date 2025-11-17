@@ -148,6 +148,8 @@ button {
     box-shadow: 0 2px 5px rgba(0,0,0,0.3);
     z-index: 10;
     touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 .text-handle.top {
@@ -163,6 +165,11 @@ button {
     height: 15px;
     background: #ffc107;
     border: 2px solid white;
+}
+
+/* Mobile-specific styles */
+.mobile-optimized {
+    /* This class can be used for mobile-specific optimizations */
 }
 
 /* --------------------------------------------------
@@ -418,31 +425,36 @@ body.dark .upload-section h6 {
 }
 
 /* --------------------------------------------------
-   RESPONSIVE STYLES
+   RESPONSIVE STYLES - MOBILE FIRST APPROACH
 -------------------------------------------------- */
-@media (max-width: 768px) {
+/* Extra small devices (phones, 320px and up) */
+@media (max-width: 575px) {
     .container {
-        padding-left: 15px;
-        padding-right: 15px;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    
+    header {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
     }
     
     header h1 {
-        font-size: 1.8rem !important;
+        font-size: 1.3rem !important;
+        margin-bottom: 5px !important;
     }
     
     .main-card {
-        padding: 15px !important;
+        padding: 10px !important;
+        border-radius: 12px;
     }
     
     #left-panel {
         border-right: none;
         border-bottom: 2px solid #ddd;
-        padding-bottom: 20px;
-        margin-bottom: 20px;
-    }
-    
-    body.dark #left-panel {
-        border-bottom: 2px solid #555;
+        padding-bottom: 15px;
+        margin-bottom: 15px;
     }
     
     .row.g-4 {
@@ -450,46 +462,153 @@ body.dark .upload-section h6 {
     }
     
     .form-control, .form-select {
-        padding: 10px;
-        font-size: 14px;
+        padding: 8px;
+        font-size: 16px !important; /* Larger for mobile touch */
+        border-radius: 8px;
     }
     
     button {
         font-size: 14px !important;
-        padding: 10px !important;
+        padding: 12px !important; /* Larger touch targets */
+        margin-bottom: 8px;
     }
     
     #meme-canvas {
-        max-height: 400px;
+        max-height: 250px;
+        border-radius: 12px;
+        border-width: 2px;
     }
     
     #darkToggle {
-        width: 70px;
-        height: 35px;
+        width: 60px;
+        height: 30px;
     }
     
     #darkToggle .circle {
-        width: 28px;
-        height: 28px;
+        width: 24px;
+        height: 24px;
     }
     
     #darkToggle svg {
-        width: 14px;
+        width: 12px;
     }
     
     .position-sliders {
         grid-template-columns: 1fr;
-        gap: 10px;
+        gap: 8px;
     }
     
     .color-controls {
         grid-template-columns: 1fr;
-        gap: 10px;
+        gap: 8px;
     }
     
     .template-grid {
         grid-template-columns: repeat(2, 1fr);
+        max-height: 150px;
+        gap: 8px;
+        padding: 8px;
+    }
+    
+    .template-img {
+        height: 60px;
+    }
+    
+    .template-name {
+        font-size: 10px;
+        padding: 4px 1px;
+    }
+    
+    .drag-instructions {
+        font-size: 12px;
+        padding: 8px;
+        margin-bottom: 10px;
+    }
+    
+    .text-handle {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .text-handle.size {
+        width: 30px;
+        height: 30px;
+    }
+    
+    .slider-group label {
+        font-size: 13px;
+    }
+    
+    .slider-value {
+        min-width: 35px;
+        font-size: 12px;
+        padding: 1px 6px;
+    }
+    
+    .color-preview {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .position-controls {
+        padding: 10px;
+        margin-bottom: 15px;
+    }
+    
+    .upload-section {
+        padding: 10px;
+        margin-top: 10px;
+    }
+}
+
+/* Small devices (phones, 576px to 767px) */
+@media (min-width: 576px) and (max-width: 767px) {
+    .container {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+    
+    header h1 {
+        font-size: 1.5rem !important;
+    }
+    
+    .main-card {
+        padding: 12px !important;
+    }
+    
+    #meme-canvas {
+        max-height: 300px;
+    }
+    
+    .template-grid {
+        grid-template-columns: repeat(2, 1fr);
+        max-height: 180px;
+    }
+    
+    .text-handle {
+        width: 30px;
+        height: 30px;
+    }
+    
+    .text-handle.size {
+        width: 25px;
+        height: 25px;
+    }
+    
+    .form-control, .form-select {
+        font-size: 16px !important;
+    }
+}
+
+/* Medium devices (tablets, 768px and up) */
+@media (min-width: 768px) and (max-width: 991px) {
+    .template-grid {
+        grid-template-columns: repeat(3, 1fr);
         max-height: 200px;
+    }
+    
+    #meme-canvas {
+        max-height: 400px;
     }
     
     .text-handle {
@@ -503,55 +622,52 @@ body.dark .upload-section h6 {
     }
 }
 
-@media (max-width: 576px) {
-    header {
-        flex-direction: column;
-        gap: 15px;
-        text-align: center;
-    }
-    
-    header h1 {
-        font-size: 1.5rem !important;
-    }
-    
-    .main-card {
-        border-radius: 15px;
-    }
-    
-    #meme-canvas {
-        max-height: 300px;
-        border-radius: 15px;
-    }
-    
-    .btn {
-        margin-bottom: 10px;
-    }
-    
-    .position-controls {
-        padding: 10px;
-    }
-    
-    .template-grid {
-        grid-template-columns: repeat(2, 1fr);
-        max-height: 180px;
-    }
-    
-    .template-img {
-        height: 70px;
-    }
-    
-    .drag-instructions {
-        font-size: 12px;
-        padding: 8px;
-    }
-    
+/* Large devices (desktops, 992px and up) */
+@media (min-width: 992px) {
     .text-handle {
-        width: 30px;
-        height: 30px;
+        width: 20px;
+        height: 20px;
     }
     
     .text-handle.size {
-        width: 25px;
-        height: 25px;
+        width: 15px;
+        height: 15px;
     }
+}
+
+/* Prevent zoom on input focus for mobile */
+@media (max-width: 768px) {
+    input, select, textarea {
+        font-size: 16px !important; /* Prevents zoom on iOS */
+    }
+}
+
+/* Improved touch scrolling */
+.template-grid {
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+}
+
+/* Better button touch targets for mobile */
+@media (max-width: 768px) {
+    .btn {
+        min-height: 44px; /* Minimum touch target size */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+/* Optimize canvas for mobile performance */
+#meme-canvas {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+}
+
+/* Mobile-specific text size adjustments */
+.mobile-text-sm {
+    font-size: 0.875rem !important;
+}
+
+.mobile-text-xs {
+    font-size: 0.75rem !important;
 }
