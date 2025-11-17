@@ -8,10 +8,10 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container py-4">
-        <header class="text-center mb-4">
-            <div class="d-flex justify-content-between align-items-center">
-                <h1 class="display-5 fw-bold text-primary">🎨 Meme Generator</h1>
+    <div class="container py-3">
+        <header class="text-center mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h1 class="display-6 fw-bold text-primary">🎨 Meme Generator</h1>
                 <div class="dark-mode-toggle">
                     <input type="checkbox" id="darkModeToggle" class="d-none">
                     <label for="darkModeToggle" class="dark-mode-switch">
@@ -21,74 +21,95 @@
                     </label>
                 </div>
             </div>
-            <p class="lead text-muted">Create memes easily - drag text anywhere!</p>
+            <p class="text-muted">Create professional memes with multiple text areas</p>
         </header>
 
-        <div class="row">
+        <div class="row g-3">
             <!-- Left Panel - Controls -->
             <div class="col-lg-4">
-                <div class="card shadow-sm mb-4">
+                <div class="card shadow-sm">
                     <div class="card-body">
                         <h5 class="card-title">📁 Templates</h5>
                         
-                        <div class="template-gallery mb-3">
-                            <div class="template-grid" id="templateGrid">
-                                <!-- Templates loaded by JS -->
-                            </div>
+                        <div class="template-search mb-2">
+                            <input type="text" id="templateSearch" class="form-control form-control-sm" placeholder="Search templates...">
                         </div>
                         
+                        <div class="template-gallery mb-3">
+                            <div class="template-grid" id="templateGrid">
+                                <!-- Templates will be loaded here -->
+                            </div>
+                        </div>
+
                         <div class="upload-section">
-                            <input type="file" id="uploadTemplate" class="form-control mb-2" accept="image/*">
-                            <button onclick="addUserTemplate()" class="btn btn-outline-primary w-100">Upload Image</button>
+                            <input type="file" id="uploadTemplate" class="form-control form-control-sm mb-2" accept="image/*">
+                            <button onclick="addUserTemplate()" class="btn btn-outline-primary btn-sm w-100">Upload Image</button>
                         </div>
                     </div>
                 </div>
 
-                <div class="card shadow-sm">
+                <div class="card shadow-sm mt-3">
                     <div class="card-body">
-                        <h5 class="card-title">✏️ Text Editor</h5>
+                        <h5 class="card-title">✏️ Text Management</h5>
                         
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Your Text</label>
-                            <textarea id="memeText" class="form-control" rows="3" placeholder="Type your meme text here...">TOP TEXT&#10;BOTTOM TEXT</textarea>
-                            <div class="form-text">💡 Press Enter for new lines</div>
-                        </div>
+                        <div class="text-controls">
+                            <div class="d-flex gap-2 mb-3">
+                                <button onclick="addTextArea()" class="btn btn-primary btn-sm flex-fill">+ Add Text Area</button>
+                                <button onclick="clearAllText()" class="btn btn-outline-danger btn-sm">Clear All</button>
+                            </div>
 
-                        <div class="row g-3">
-                            <div class="col-6">
-                                <label class="form-label">Text Size</label>
-                                <input type="range" id="textSize" class="form-range" min="20" max="60" value="36">
-                                <div class="text-center"><small id="textSizeValue">36px</small></div>
+                            <div class="text-areas-container" id="textAreasContainer">
+                                <!-- Text areas will be added here -->
                             </div>
-                            <div class="col-6">
-                                <label class="form-label">Stroke</label>
-                                <input type="range" id="strokeWidth" class="form-range" min="0" max="6" value="3">
-                                <div class="text-center"><small id="strokeWidthValue">3px</small></div>
-                            </div>
-                            
-                            <div class="col-6">
-                                <label class="form-label">Text Color</label>
-                                <input type="color" id="textColor" class="form-control form-control-color" value="#ffffff">
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label">Stroke Color</label>
-                                <input type="color" id="strokeColor" class="form-control form-control-color" value="#000000">
-                            </div>
-                            
-                            <div class="col-12">
-                                <label class="form-label">Font</label>
-                                <select id="fontFamily" class="form-select">
-                                    <option value="Impact">Impact (Classic)</option>
-                                    <option value="Arial Black">Arial Black</option>
-                                    <option value="Comic Sans MS">Comic Sans</option>
-                                    <option value="Verdana">Verdana</option>
-                                </select>
+
+                            <div class="text-properties mt-3">
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        <label class="form-label">Font Size</label>
+                                        <input type="range" id="textSize" class="form-range" min="16" max="80" value="36">
+                                        <div class="text-center small" id="textSizeValue">36px</div>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label">Stroke</label>
+                                        <input type="range" id="strokeWidth" class="form-range" min="0" max="8" value="3">
+                                        <div class="text-center small" id="strokeWidthValue">3px</div>
+                                    </div>
+                                    
+                                    <div class="col-6">
+                                        <label class="form-label">Text Color</label>
+                                        <input type="color" id="textColor" class="form-control form-control-color" value="#ffffff">
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label">Stroke Color</label>
+                                        <input type="color" id="strokeColor" class="form-control form-control-color" value="#000000">
+                                    </div>
+                                    
+                                    <div class="col-12">
+                                        <label class="form-label">Font Family</label>
+                                        <select id="fontFamily" class="form-select">
+                                            <option value="Impact">Impact</option>
+                                            <option value="Arial Black">Arial Black</option>
+                                            <option value="Comic Sans MS">Comic Sans</option>
+                                            <option value="Verdana">Verdana</option>
+                                            <option value="Georgia">Georgia</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <label class="form-label">Text Alignment</label>
+                                        <select id="textAlign" class="form-select">
+                                            <option value="center">Center</option>
+                                            <option value="left">Left</option>
+                                            <option value="right">Right</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
                         <div class="d-grid gap-2 mt-3">
-                            <button onclick="updateMeme()" class="btn btn-primary">Update Meme</button>
-                            <button onclick="downloadMeme()" class="btn btn-success">💾 Download</button>
+                            <button onclick="updateCanvas()" class="btn btn-success">Update Canvas</button>
+                            <button onclick="downloadMeme()" class="btn btn-primary">💾 Download Meme</button>
                         </div>
                     </div>
                 </div>
@@ -99,18 +120,24 @@
                 <div class="card shadow-sm">
                     <div class="card-body text-center">
                         <div class="canvas-container position-relative">
-                            <canvas id="meme-canvas"></canvas>
+                            <canvas id="memeCanvas"></canvas>
                             <div class="canvas-overlay" id="canvasOverlay">
-                                <!-- Text boxes will be added here -->
+                                <!-- Text areas will be positioned here -->
                             </div>
-                            <div class="zoom-controls">
-                                <button class="zoom-btn" onclick="zoomOut()">−</button>
-                                <div class="zoom-value" id="zoomValue">100%</div>
-                                <button class="zoom-btn" onclick="zoomIn()">+</button>
+                            <div class="canvas-controls">
+                                <div class="zoom-controls">
+                                    <button class="btn btn-sm btn-outline-secondary" onclick="zoomOut()">−</button>
+                                    <span class="zoom-value" id="zoomValue">100%</span>
+                                    <button class="btn btn-sm btn-outline-secondary" onclick="zoomIn()">+</button>
+                                </div>
+                                <button class="btn btn-sm btn-outline-secondary" onclick="resetZoom()">Reset</button>
                             </div>
                         </div>
-                        <div class="mt-3">
-                            <small class="text-muted">📱 Drag text boxes to move • Pinch to zoom on mobile</small>
+                        <div class="canvas-instructions mt-2">
+                            <small class="text-muted">
+                                📱 <strong>Mobile:</strong> Drag text areas • Pinch to zoom<br>
+                                💻 <strong>Desktop:</strong> Drag text areas • Scroll to zoom
+                            </small>
                         </div>
                     </div>
                 </div>
@@ -119,386 +146,663 @@
     </div>
 
     <script>
-        // Meme Generator - Simple & Practical
-        const canvas = document.getElementById('meme-canvas');
-        const ctx = canvas.getContext('2d');
-        const canvasOverlay = document.getElementById('canvasOverlay');
-
-        // Current state
-        let currentImage = null;
-        let textElements = [];
-        let canvasScale = 1.0;
-        let isDragging = false;
-        let currentDragElement = null;
-        let dragOffsetX = 0;
-        let dragOffsetY = 0;
-
-        // Meme templates
-        const memeTemplates = [
-            { name: "Drake", url: "https://i.imgflip.com/30b1gx.jpg" },
-            { name: "Doge", url: "https://i.imgflip.com/4t0m5.jpg" },
-            { name: "Two Buttons", url: "https://i.imgflip.com/1g8my4.jpg" },
-            { name: "Distracted BF", url: "https://i.imgflip.com/1ur9b0.jpg" },
-            { name: "Change My Mind", url: "https://i.imgflip.com/24y43o.jpg" },
-            { name: "Woman Yelling", url: "https://i.imgflip.com/345v97.jpg" }
-        ];
-
-        // User templates
-        let userTemplates = JSON.parse(localStorage.getItem('userTemplates')) || [];
-
-        // Initialize when page loads
-        window.addEventListener('load', init);
-
-        function init() {
-            setupDarkMode();
-            initializeTemplateGallery();
-            setupEventListeners();
-            loadImage(memeTemplates[0].url);
-            createDefaultTextElements();
-        }
-
-        function setupDarkMode() {
-            const darkModeToggle = document.getElementById('darkModeToggle');
-            const savedMode = localStorage.getItem('darkMode');
-            
-            if (savedMode === 'enabled') {
-                darkModeToggle.checked = true;
-                document.body.classList.add('dark-mode');
+        // Meme Generator Application
+        class MemeGenerator {
+            constructor() {
+                this.canvas = document.getElementById('memeCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.canvasOverlay = document.getElementById('canvasOverlay');
+                this.textAreasContainer = document.getElementById('textAreasContainer');
+                
+                this.currentImage = null;
+                this.textAreas = [];
+                this.canvasScale = 1.0;
+                this.canvasOffsetX = 0;
+                this.canvasOffsetY = 0;
+                this.isDragging = false;
+                this.isPanning = false;
+                this.currentDragElement = null;
+                this.dragOffsetX = 0;
+                this.dragOffsetY = 0;
+                this.startPanX = 0;
+                this.startPanY = 0;
+                
+                this.memeTemplates = [
+                    { name: "Drake", url: "https://i.imgflip.com/30b1gx.jpg" },
+                    { name: "Doge", url: "https://i.imgflip.com/4t0m5.jpg" },
+                    { name: "Two Buttons", url: "https://i.imgflip.com/1g8my4.jpg" },
+                    { name: "Distracted BF", url: "https://i.imgflip.com/1ur9b0.jpg" },
+                    { name: "Change My Mind", url: "https://i.imgflip.com/24y43o.jpg" },
+                    { name: "Woman Yelling", url: "https://i.imgflip.com/345v97.jpg" },
+                    { name: "Left Exit 12", url: "https://i.imgflip.com/22bdq6.jpg" },
+                    { name: "Running Balloon", url: "https://i.imgflip.com/261o3j.jpg" }
+                ];
+                
+                this.userTemplates = JSON.parse(localStorage.getItem('userTemplates')) || [];
+                
+                this.init();
             }
-            
-            darkModeToggle.addEventListener('change', function() {
-                if (this.checked) {
+
+            init() {
+                this.setupDarkMode();
+                this.setupEventListeners();
+                this.initializeTemplateGallery();
+                this.loadImage(this.memeTemplates[0].url);
+                this.addDefaultTextAreas();
+                this.updateZoomDisplay();
+            }
+
+            setupDarkMode() {
+                const darkModeToggle = document.getElementById('darkModeToggle');
+                const savedMode = localStorage.getItem('darkMode');
+                
+                if (savedMode === 'enabled') {
+                    darkModeToggle.checked = true;
                     document.body.classList.add('dark-mode');
-                    localStorage.setItem('darkMode', 'enabled');
-                } else {
-                    document.body.classList.remove('dark-mode');
-                    localStorage.setItem('darkMode', 'disabled');
                 }
-            });
-        }
-
-        function initializeTemplateGallery() {
-            const templateGrid = document.getElementById('templateGrid');
-            
-            // Load all templates
-            [...memeTemplates, ...userTemplates].forEach((template, index) => {
-                const templateItem = document.createElement('div');
-                templateItem.className = 'template-item' + (index === 0 ? ' active' : '');
-                templateItem.innerHTML = `
-                    <img src="${template.url}" alt="${template.name}" class="template-img">
-                    <span class="template-name">${template.name}</span>
-                `;
                 
-                templateItem.addEventListener('click', () => {
-                    document.querySelectorAll('.template-item').forEach(item => item.classList.remove('active'));
-                    templateItem.classList.add('active');
-                    loadImage(template.url);
+                darkModeToggle.addEventListener('change', (e) => {
+                    if (e.target.checked) {
+                        document.body.classList.add('dark-mode');
+                        localStorage.setItem('darkMode', 'enabled');
+                    } else {
+                        document.body.classList.remove('dark-mode');
+                        localStorage.setItem('darkMode', 'disabled');
+                    }
                 });
-                
-                templateGrid.appendChild(templateItem);
-            });
-        }
-
-        function setupEventListeners() {
-            // Text input
-            document.getElementById('memeText').addEventListener('input', updateMeme);
-            
-            // Text controls
-            document.getElementById('textSize').addEventListener('input', function() {
-                document.getElementById('textSizeValue').textContent = this.value + 'px';
-                updateMeme();
-            });
-            
-            document.getElementById('strokeWidth').addEventListener('input', function() {
-                document.getElementById('strokeWidthValue').textContent = this.value + 'px';
-                updateMeme();
-            });
-            
-            document.getElementById('textColor').addEventListener('input', updateMeme);
-            document.getElementById('strokeColor').addEventListener('input', updateMeme);
-            document.getElementById('fontFamily').addEventListener('change', updateMeme);
-
-            // Touch/Mouse events for canvas
-            canvasOverlay.addEventListener('mousedown', startDrag);
-            canvasOverlay.addEventListener('touchstart', startDragTouch, { passive: false });
-        }
-
-        function loadImage(url) {
-            currentImage = new Image();
-            currentImage.crossOrigin = "anonymous";
-            currentImage.src = url;
-            
-            currentImage.onload = function() {
-                // Set canvas size with good quality
-                const maxWidth = 800;
-                const scale = Math.min(maxWidth / currentImage.width, 1);
-                
-                canvas.width = currentImage.width * scale;
-                canvas.height = currentImage.height * scale;
-                
-                // Clear and redraw
-                canvasOverlay.innerHTML = '';
-                createDefaultTextElements();
-                updateMeme();
-            };
-        }
-
-        function createDefaultTextElements() {
-            textElements = [
-                { text: "TOP TEXT", x: 50, y: 15 },
-                { text: "BOTTOM TEXT", x: 50, y: 85 }
-            ];
-            createTextBoxes();
-        }
-
-        function createTextBoxes() {
-            canvasOverlay.innerHTML = '';
-            
-            textElements.forEach((element, index) => {
-                const textBox = document.createElement('div');
-                textBox.className = 'text-box';
-                textBox.textContent = element.text;
-                textBox.dataset.index = index;
-                
-                // Position text box
-                updateTextBoxPosition(textBox, element);
-                
-                canvasOverlay.appendChild(textBox);
-            });
-        }
-
-        function updateTextBoxPosition(textBox, element) {
-            const rect = canvas.getBoundingClientRect();
-            const x = (element.x / 100) * rect.width;
-            const y = (element.y / 100) * rect.height;
-            
-            textBox.style.left = (x - textBox.offsetWidth / 2) + 'px';
-            textBox.style.top = (y - textBox.offsetHeight / 2) + 'px';
-        }
-
-        function startDrag(e) {
-            if (e.target.classList.contains('text-box')) {
-                isDragging = true;
-                currentDragElement = e.target;
-                const rect = canvas.getBoundingClientRect();
-                dragOffsetX = e.clientX - currentDragElement.getBoundingClientRect().left;
-                dragOffsetY = e.clientY - currentDragElement.getBoundingClientRect().top;
-                
-                document.addEventListener('mousemove', drag);
-                document.addEventListener('mouseup', stopDrag);
-                e.preventDefault();
             }
-        }
 
-        function startDragTouch(e) {
-            if (e.target.classList.contains('text-box')) {
-                isDragging = true;
-                currentDragElement = e.target;
-                const touch = e.touches[0];
-                const rect = canvas.getBoundingClientRect();
-                dragOffsetX = touch.clientX - currentDragElement.getBoundingClientRect().left;
-                dragOffsetY = touch.clientY - currentDragElement.getBoundingClientRect().top;
-                
-                document.addEventListener('touchmove', dragTouch, { passive: false });
-                document.addEventListener('touchend', stopDrag);
-                e.preventDefault();
+            setupEventListeners() {
+                // Text controls
+                document.getElementById('textSize').addEventListener('input', (e) => {
+                    document.getElementById('textSizeValue').textContent = e.target.value + 'px';
+                    this.updateAllTextAreas();
+                });
+
+                document.getElementById('strokeWidth').addEventListener('input', (e) => {
+                    document.getElementById('strokeWidthValue').textContent = e.target.value + 'px';
+                    this.updateAllTextAreas();
+                });
+
+                document.getElementById('textColor').addEventListener('input', () => this.updateAllTextAreas());
+                document.getElementById('strokeColor').addEventListener('input', () => this.updateAllTextAreas());
+                document.getElementById('fontFamily').addEventListener('change', () => this.updateAllTextAreas());
+                document.getElementById('textAlign').addEventListener('change', () => this.updateAllTextAreas());
+
+                // Template search
+                document.getElementById('templateSearch').addEventListener('input', (e) => {
+                    this.filterTemplates(e.target.value.toLowerCase());
+                });
+
+                // Canvas interactions
+                this.canvas.addEventListener('wheel', (e) => this.handleZoom(e));
+                this.canvas.addEventListener('mousedown', (e) => this.startPan(e));
+                this.canvas.addEventListener('touchstart', (e) => this.startPanTouch(e), { passive: false });
+
+                // Window resize
+                window.addEventListener('resize', () => {
+                    if (this.currentImage) {
+                        this.updateCanvasSize();
+                        this.updateAllTextAreas();
+                    }
+                });
             }
-        }
 
-        function drag(e) {
-            if (!isDragging) return;
-            
-            const rect = canvas.getBoundingClientRect();
-            const x = ((e.clientX - dragOffsetX - rect.left + currentDragElement.offsetWidth / 2) / rect.width) * 100;
-            const y = ((e.clientY - dragOffsetY - rect.top + currentDragElement.offsetHeight / 2) / rect.height) * 100;
-            
-            const index = parseInt(currentDragElement.dataset.index);
-            textElements[index].x = Math.max(5, Math.min(95, x));
-            textElements[index].y = Math.max(5, Math.min(95, y));
-            
-            updateTextBoxPosition(currentDragElement, textElements[index]);
-        }
-
-        function dragTouch(e) {
-            if (!isDragging) return;
-            e.preventDefault();
-            
-            const touch = e.touches[0];
-            const rect = canvas.getBoundingClientRect();
-            const x = ((touch.clientX - dragOffsetX - rect.left + currentDragElement.offsetWidth / 2) / rect.width) * 100;
-            const y = ((touch.clientY - dragOffsetY - rect.top + currentDragElement.offsetHeight / 2) / rect.height) * 100;
-            
-            const index = parseInt(currentDragElement.dataset.index);
-            textElements[index].x = Math.max(5, Math.min(95, x));
-            textElements[index].y = Math.max(5, Math.min(95, y));
-            
-            updateTextBoxPosition(currentDragElement, textElements[index]);
-        }
-
-        function stopDrag() {
-            isDragging = false;
-            currentDragElement = null;
-            document.removeEventListener('mousemove', drag);
-            document.removeEventListener('touchmove', dragTouch);
-            document.removeEventListener('mouseup', stopDrag);
-            document.removeEventListener('touchend', stopDrag);
-            updateMeme();
-        }
-
-        function updateMeme() {
-            if (!currentImage || !currentImage.complete) return;
-            
-            // Clear canvas
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // Draw image
-            ctx.drawImage(currentImage, 0, 0, canvas.width, canvas.height);
-            
-            // Get text from textarea and split by lines
-            const textInput = document.getElementById('memeText').value;
-            const lines = textInput.split('\n').filter(line => line.trim() !== '');
-            
-            // Update text elements with new content
-            textElements.forEach((element, index) => {
-                if (lines[index]) {
-                    element.text = lines[index];
-                }
-            });
-            
-            // Update text boxes display
-            createTextBoxes();
-            
-            // Get styling values
-            const textSize = parseInt(document.getElementById('textSize').value);
-            const strokeWidth = parseInt(document.getElementById('strokeWidth').value);
-            const textColor = document.getElementById('textColor').value;
-            const strokeColor = document.getElementById('strokeColor').value;
-            const fontFamily = document.getElementById('fontFamily').value;
-            
-            // Draw text on canvas
-            textElements.forEach(element => {
-                if (!element.text) return;
+            initializeTemplateGallery() {
+                const templateGrid = document.getElementById('templateGrid');
+                const allTemplates = [...this.memeTemplates, ...this.userTemplates];
                 
-                ctx.font = `bold ${textSize}px ${fontFamily}`;
-                ctx.fillStyle = textColor;
-                ctx.strokeStyle = strokeColor;
-                ctx.lineWidth = strokeWidth;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
+                allTemplates.forEach((template, index) => {
+                    const templateItem = document.createElement('div');
+                    templateItem.className = `template-item ${index === 0 ? 'active' : ''}`;
+                    templateItem.innerHTML = `
+                        <img src="${template.url}" alt="${template.name}" class="template-img" loading="lazy">
+                        <span class="template-name">${template.name}</span>
+                    `;
+                    
+                    templateItem.addEventListener('click', () => {
+                        document.querySelectorAll('.template-item').forEach(item => item.classList.remove('active'));
+                        templateItem.classList.add('active');
+                        this.loadImage(template.url);
+                    });
+                    
+                    templateGrid.appendChild(templateItem);
+                });
+            }
+
+            filterTemplates(searchTerm) {
+                const allTemplates = [...this.memeTemplates, ...this.userTemplates];
+                const filteredTemplates = allTemplates.filter(template => 
+                    template.name.toLowerCase().includes(searchTerm)
+                );
                 
-                const x = (element.x / 100) * canvas.width;
-                const y = (element.y / 100) * canvas.height;
+                const templateGrid = document.getElementById('templateGrid');
+                templateGrid.innerHTML = '';
                 
-                // Draw stroke (outline)
-                if (strokeWidth > 0) {
-                    ctx.strokeText(element.text.toUpperCase(), x, y);
+                if (filteredTemplates.length === 0) {
+                    templateGrid.innerHTML = '<div class="no-templates">No templates found</div>';
+                    return;
                 }
                 
-                // Draw fill
-                ctx.fillText(element.text.toUpperCase(), x, y);
-            });
-        }
-
-        function zoomIn() {
-            canvasScale = Math.min(3, canvasScale + 0.2);
-            updateZoomDisplay();
-            updateMeme();
-        }
-
-        function zoomOut() {
-            canvasScale = Math.max(0.5, canvasScale - 0.2);
-            updateZoomDisplay();
-            updateMeme();
-        }
-
-        function updateZoomDisplay() {
-            document.getElementById('zoomValue').textContent = Math.round(canvasScale * 100) + '%';
-        }
-
-        function addUserTemplate() {
-            const fileInput = document.getElementById('uploadTemplate');
-            const file = fileInput.files[0];
-            
-            if (!file) {
-                alert('Please select an image file');
-                return;
+                filteredTemplates.forEach((template, index) => {
+                    const templateItem = document.createElement('div');
+                    templateItem.className = `template-item ${index === 0 ? 'active' : ''}`;
+                    templateItem.innerHTML = `
+                        <img src="${template.url}" alt="${template.name}" class="template-img">
+                        <span class="template-name">${template.name}</span>
+                    `;
+                    
+                    templateItem.addEventListener('click', () => {
+                        document.querySelectorAll('.template-item').forEach(item => item.classList.remove('active'));
+                        templateItem.classList.add('active');
+                        this.loadImage(template.url);
+                    });
+                    
+                    templateGrid.appendChild(templateItem);
+                });
             }
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const name = file.name.split('.')[0] || 'Custom Template';
-                const newTemplate = {
-                    name: name,
-                    url: e.target.result
+
+            loadImage(url) {
+                this.currentImage = new Image();
+                this.currentImage.crossOrigin = "anonymous";
+                this.currentImage.src = url;
+                
+                this.currentImage.onload = () => {
+                    this.updateCanvasSize();
+                    this.textAreas = [];
+                    this.canvasOverlay.innerHTML = '';
+                    this.textAreasContainer.innerHTML = '';
+                    this.addDefaultTextAreas();
+                    this.updateCanvas();
                 };
                 
-                userTemplates.push(newTemplate);
-                localStorage.setItem('userTemplates', JSON.stringify(userTemplates));
+                this.currentImage.onerror = () => {
+                    console.error('Failed to load image:', url);
+                    alert('Failed to load image. Please try another template.');
+                };
+            }
+
+            updateCanvasSize() {
+                const container = this.canvas.parentElement;
+                const maxWidth = Math.min(800, container.clientWidth - 40);
+                const scale = maxWidth / this.currentImage.width;
                 
-                // Reload template gallery
-                document.getElementById('templateGrid').innerHTML = '';
-                initializeTemplateGallery();
+                this.canvas.width = this.currentImage.width * scale;
+                this.canvas.height = this.currentImage.height * scale;
+            }
+
+            addDefaultTextAreas() {
+                this.addTextArea("TOP TEXT", 50, 15);
+                this.addTextArea("BOTTOM TEXT", 50, 85);
+            }
+
+            addTextArea(text = "NEW TEXT", x = 50, y = 50) {
+                const id = 'text_' + Date.now();
+                const textArea = {
+                    id,
+                    text,
+                    x,
+                    y,
+                    width: 200,
+                    height: 60
+                };
                 
-                fileInput.value = '';
-                alert('Template added successfully!');
-            };
-            reader.readAsDataURL(file);
+                this.textAreas.push(textArea);
+                this.createTextAreaElement(textArea);
+                this.createTextAreaControl(textArea);
+            }
+
+            createTextAreaElement(textArea) {
+                const textElement = document.createElement('div');
+                textElement.className = 'text-area';
+                textElement.id = `text-${textArea.id}`;
+                textElement.innerHTML = `
+                    <div class="text-content">${textArea.text}</div>
+                    <div class="text-handles">
+                        <div class="handle drag">⤮</div>
+                        <div class="handle delete" onclick="memeGenerator.deleteTextArea('${textArea.id}')">×</div>
+                    </div>
+                `;
+                
+                // Position text area
+                this.updateTextAreaPosition(textElement, textArea);
+                
+                // Style text area
+                this.updateTextAreaStyle(textElement);
+                
+                // Add drag functionality
+                this.setupTextAreaDrag(textElement, textArea);
+                
+                this.canvasOverlay.appendChild(textElement);
+            }
+
+            createTextAreaControl(textArea) {
+                const control = document.createElement('div');
+                control.className = 'text-area-control';
+                control.innerHTML = `
+                    <div class="d-flex align-items-center gap-2 p-2 border rounded">
+                        <input type="text" 
+                               class="form-control form-control-sm" 
+                               value="${textArea.text}" 
+                               placeholder="Enter text..."
+                               oninput="memeGenerator.updateTextAreaText('${textArea.id}', this.value)">
+                        <button class="btn btn-sm btn-outline-danger" onclick="memeGenerator.deleteTextArea('${textArea.id}')">×</button>
+                    </div>
+                `;
+                
+                this.textAreasContainer.appendChild(control);
+            }
+
+            setupTextAreaDrag(textElement, textArea) {
+                const dragHandle = textElement.querySelector('.handle.drag');
+                
+                const startDrag = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    this.isDragging = true;
+                    this.currentDragElement = textArea;
+                    
+                    const rect = textElement.getBoundingClientRect();
+                    const canvasRect = this.canvas.getBoundingClientRect();
+                    
+                    this.dragOffsetX = e.clientX - rect.left;
+                    this.dragOffsetY = e.clientY - rect.top;
+                    
+                    document.addEventListener('mousemove', drag);
+                    document.addEventListener('mouseup', stopDrag);
+                };
+
+                const startDragTouch = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    this.isDragging = true;
+                    this.currentDragElement = textArea;
+                    
+                    const touch = e.touches[0];
+                    const rect = textElement.getBoundingClientRect();
+                    const canvasRect = this.canvas.getBoundingClientRect();
+                    
+                    this.dragOffsetX = touch.clientX - rect.left;
+                    this.dragOffsetY = touch.clientY - rect.top;
+                    
+                    document.addEventListener('touchmove', dragTouch, { passive: false });
+                    document.addEventListener('touchend', stopDrag);
+                };
+
+                const drag = (e) => {
+                    if (!this.isDragging || this.currentDragElement !== textArea) return;
+                    
+                    const canvasRect = this.canvas.getBoundingClientRect();
+                    const x = ((e.clientX - this.dragOffsetX - canvasRect.left + textElement.offsetWidth / 2) / canvasRect.width) * 100;
+                    const y = ((e.clientY - this.dragOffsetY - canvasRect.top + textElement.offsetHeight / 2) / canvasRect.height) * 100;
+                    
+                    textArea.x = Math.max(2, Math.min(98, x));
+                    textArea.y = Math.max(2, Math.min(98, y));
+                    
+                    this.updateTextAreaPosition(textElement, textArea);
+                };
+
+                const dragTouch = (e) => {
+                    if (!this.isDragging || this.currentDragElement !== textArea) return;
+                    e.preventDefault();
+                    
+                    const touch = e.touches[0];
+                    const canvasRect = this.canvas.getBoundingClientRect();
+                    const x = ((touch.clientX - this.dragOffsetX - canvasRect.left + textElement.offsetWidth / 2) / canvasRect.width) * 100;
+                    const y = ((touch.clientY - this.dragOffsetY - canvasRect.top + textElement.offsetHeight / 2) / canvasRect.height) * 100;
+                    
+                    textArea.x = Math.max(2, Math.min(98, x));
+                    textArea.y = Math.max(2, Math.min(98, y));
+                    
+                    this.updateTextAreaPosition(textElement, textArea);
+                };
+
+                const stopDrag = () => {
+                    this.isDragging = false;
+                    this.currentDragElement = null;
+                    document.removeEventListener('mousemove', drag);
+                    document.removeEventListener('touchmove', dragTouch);
+                    document.removeEventListener('mouseup', stopDrag);
+                    document.removeEventListener('touchend', stopDrag);
+                    this.updateCanvas();
+                };
+
+                dragHandle.addEventListener('mousedown', startDrag);
+                dragHandle.addEventListener('touchstart', startDragTouch, { passive: false });
+            }
+
+            updateTextAreaPosition(textElement, textArea) {
+                const canvasRect = this.canvas.getBoundingClientRect();
+                const x = (textArea.x / 100) * canvasRect.width;
+                const y = (textArea.y / 100) * canvasRect.height;
+                
+                textElement.style.left = (x - textElement.offsetWidth / 2) + 'px';
+                textElement.style.top = (y - textElement.offsetHeight / 2) + 'px';
+            }
+
+            updateTextAreaStyle(textElement) {
+                const textSize = document.getElementById('textSize').value;
+                const strokeWidth = document.getElementById('strokeWidth').value;
+                const textColor = document.getElementById('textColor').value;
+                const strokeColor = document.getElementById('strokeColor').value;
+                const fontFamily = document.getElementById('fontFamily').value;
+                
+                textElement.style.fontSize = textSize + 'px';
+                textElement.style.color = textColor;
+                textElement.style.fontFamily = fontFamily;
+                textElement.style.textShadow = `
+                    ${strokeWidth}px ${strokeWidth}px 0 ${strokeColor},
+                    -${strokeWidth}px -${strokeWidth}px 0 ${strokeColor},
+                    ${strokeWidth}px -${strokeWidth}px 0 ${strokeColor},
+                    -${strokeWidth}px ${strokeWidth}px 0 ${strokeColor}
+                `;
+            }
+
+            updateTextAreaText(id, newText) {
+                const textArea = this.textAreas.find(area => area.id === id);
+                if (textArea) {
+                    textArea.text = newText;
+                    const textElement = document.getElementById(`text-${id}`);
+                    if (textElement) {
+                        textElement.querySelector('.text-content').textContent = newText;
+                    }
+                    this.updateCanvas();
+                }
+            }
+
+            updateAllTextAreas() {
+                this.textAreas.forEach(textArea => {
+                    const textElement = document.getElementById(`text-${textArea.id}`);
+                    if (textElement) {
+                        this.updateTextAreaStyle(textElement);
+                    }
+                });
+                this.updateCanvas();
+            }
+
+            deleteTextArea(id) {
+                this.textAreas = this.textAreas.filter(area => area.id !== id);
+                
+                // Remove from DOM
+                const textElement = document.getElementById(`text-${id}`);
+                if (textElement) textElement.remove();
+                
+                // Remove control
+                const controls = this.textAreasContainer.querySelectorAll('.text-area-control');
+                controls.forEach(control => {
+                    if (control.querySelector(`[oninput*="${id}"]`)) {
+                        control.remove();
+                    }
+                });
+                
+                this.updateCanvas();
+            }
+
+            clearAllText() {
+                if (confirm('Are you sure you want to remove all text areas?')) {
+                    this.textAreas = [];
+                    this.canvasOverlay.innerHTML = '';
+                    this.textAreasContainer.innerHTML = '';
+                    this.updateCanvas();
+                }
+            }
+
+            handleZoom(e) {
+                e.preventDefault();
+                const zoomIntensity = 0.1;
+                const wheel = e.deltaY < 0 ? 1 : -1;
+                const zoom = Math.exp(wheel * zoomIntensity);
+                
+                this.canvasScale = Math.max(0.5, Math.min(3, this.canvasScale * zoom));
+                this.updateZoomDisplay();
+                this.updateCanvas();
+            }
+
+            startPan(e) {
+                if (e.button !== 0) return; // Only left mouse button
+                this.isPanning = true;
+                this.startPanX = e.clientX - this.canvasOffsetX;
+                this.startPanY = e.clientY - this.canvasOffsetY;
+                this.canvas.style.cursor = 'grabbing';
+                
+                document.addEventListener('mousemove', this.pan.bind(this));
+                document.addEventListener('mouseup', this.stopPan.bind(this));
+            }
+
+            startPanTouch(e) {
+                if (e.touches.length === 1) {
+                    this.isPanning = true;
+                    this.startPanX = e.touches[0].clientX - this.canvasOffsetX;
+                    this.startPanY = e.touches[0].clientY - this.canvasOffsetY;
+                    
+                    document.addEventListener('touchmove', this.panTouch.bind(this), { passive: false });
+                    document.addEventListener('touchend', this.stopPan.bind(this));
+                }
+            }
+
+            pan(e) {
+                if (!this.isPanning) return;
+                this.canvasOffsetX = e.clientX - this.startPanX;
+                this.canvasOffsetY = e.clientY - this.startPanY;
+                this.updateCanvas();
+            }
+
+            panTouch(e) {
+                if (!this.isPanning) return;
+                e.preventDefault();
+                if (e.touches.length === 1) {
+                    this.canvasOffsetX = e.touches[0].clientX - this.startPanX;
+                    this.canvasOffsetY = e.touches[0].clientY - this.startPanY;
+                    this.updateCanvas();
+                }
+            }
+
+            stopPan() {
+                this.isPanning = false;
+                this.canvas.style.cursor = 'default';
+                document.removeEventListener('mousemove', this.pan);
+                document.removeEventListener('touchmove', this.panTouch);
+                document.removeEventListener('mouseup', this.stopPan);
+                document.removeEventListener('touchend', this.stopPan);
+            }
+
+            zoomIn() {
+                this.canvasScale = Math.min(3, this.canvasScale + 0.2);
+                this.updateZoomDisplay();
+                this.updateCanvas();
+            }
+
+            zoomOut() {
+                this.canvasScale = Math.max(0.5, this.canvasScale - 0.2);
+                this.updateZoomDisplay();
+                this.updateCanvas();
+            }
+
+            resetZoom() {
+                this.canvasScale = 1.0;
+                this.canvasOffsetX = 0;
+                this.canvasOffsetY = 0;
+                this.updateZoomDisplay();
+                this.updateCanvas();
+            }
+
+            updateZoomDisplay() {
+                document.getElementById('zoomValue').textContent = Math.round(this.canvasScale * 100) + '%';
+            }
+
+            updateCanvas() {
+                if (!this.currentImage || !this.currentImage.complete) return;
+                
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                // Apply zoom and pan transformations
+                this.ctx.save();
+                this.ctx.translate(this.canvasOffsetX, this.canvasOffsetY);
+                this.ctx.scale(this.canvasScale, this.canvasScale);
+                
+                // Draw image
+                this.ctx.drawImage(this.currentImage, 0, 0, this.canvas.width, this.canvas.height);
+                
+                // Draw text areas
+                const textSize = document.getElementById('textSize').value;
+                const strokeWidth = document.getElementById('strokeWidth').value;
+                const textColor = document.getElementById('textColor').value;
+                const strokeColor = document.getElementById('strokeColor').value;
+                const fontFamily = document.getElementById('fontFamily').value;
+                const textAlign = document.getElementById('textAlign').value;
+                
+                this.textAreas.forEach(textArea => {
+                    if (!textArea.text) return;
+                    
+                    this.ctx.font = `bold ${textSize}px ${fontFamily}`;
+                    this.ctx.fillStyle = textColor;
+                    this.ctx.strokeStyle = strokeColor;
+                    this.ctx.lineWidth = strokeWidth;
+                    this.ctx.textAlign = textAlign;
+                    this.ctx.textBaseline = 'middle';
+                    
+                    const x = (textArea.x / 100) * this.canvas.width;
+                    const y = (textArea.y / 100) * this.canvas.height;
+                    
+                    // Draw stroke
+                    if (strokeWidth > 0) {
+                        this.ctx.strokeText(textArea.text.toUpperCase(), x, y);
+                    }
+                    
+                    // Draw fill
+                    this.ctx.fillText(textArea.text.toUpperCase(), x, y);
+                });
+                
+                this.ctx.restore();
+            }
+
+            downloadMeme() {
+                if (!this.currentImage || !this.currentImage.complete) {
+                    alert('Please wait for the image to load');
+                    return;
+                }
+                
+                // Create high-quality canvas
+                const tempCanvas = document.createElement('canvas');
+                const tempCtx = tempCanvas.getContext('2d');
+                
+                // Use original dimensions for best quality
+                tempCanvas.width = this.currentImage.width;
+                tempCanvas.height = this.currentImage.height;
+                
+                // Draw image
+                tempCtx.drawImage(this.currentImage, 0, 0, tempCanvas.width, tempCanvas.height);
+                
+                // Scale text properties
+                const textSize = parseInt(document.getElementById('textSize').value);
+                const strokeWidth = parseInt(document.getElementById('strokeWidth').value);
+                const textColor = document.getElementById('textColor').value;
+                const strokeColor = document.getElementById('strokeColor').value;
+                const fontFamily = document.getElementById('fontFamily').value;
+                const textAlign = document.getElementById('textAlign').value;
+                
+                const scaleFactor = tempCanvas.width / this.canvas.width;
+                const scaledTextSize = textSize * scaleFactor;
+                const scaledStrokeWidth = strokeWidth * scaleFactor;
+                
+                // Draw text
+                this.textAreas.forEach(textArea => {
+                    if (!textArea.text) return;
+                    
+                    tempCtx.font = `bold ${scaledTextSize}px ${fontFamily}`;
+                    tempCtx.fillStyle = textColor;
+                    tempCtx.strokeStyle = strokeColor;
+                    tempCtx.lineWidth = scaledStrokeWidth;
+                    tempCtx.textAlign = textAlign;
+                    tempCtx.textBaseline = 'middle';
+                    
+                    const x = (textArea.x / 100) * tempCanvas.width;
+                    const y = (textArea.y / 100) * tempCanvas.height;
+                    
+                    if (scaledStrokeWidth > 0) {
+                        tempCtx.strokeText(textArea.text.toUpperCase(), x, y);
+                    }
+                    tempCtx.fillText(textArea.text.toUpperCase(), x, y);
+                });
+                
+                // Download
+                const link = document.createElement('a');
+                link.download = 'meme.png';
+                link.href = tempCanvas.toDataURL('image/png');
+                link.click();
+            }
+
+            addUserTemplate() {
+                const fileInput = document.getElementById('uploadTemplate');
+                const file = fileInput.files[0];
+                
+                if (!file) {
+                    alert('Please select an image file');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const name = file.name.split('.')[0] || 'Custom Template';
+                    const newTemplate = {
+                        name: name,
+                        url: e.target.result
+                    };
+                    
+                    this.userTemplates.push(newTemplate);
+                    localStorage.setItem('userTemplates', JSON.stringify(this.userTemplates));
+                    
+                    // Reload template gallery
+                    document.getElementById('templateGrid').innerHTML = '';
+                    this.initializeTemplateGallery();
+                    
+                    fileInput.value = '';
+                    alert('Template added successfully!');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Global functions for HTML onclick attributes
+        function addTextArea() {
+            memeGenerator.addTextArea();
+        }
+
+        function clearAllText() {
+            memeGenerator.clearAllText();
+        }
+
+        function updateCanvas() {
+            memeGenerator.updateCanvas();
         }
 
         function downloadMeme() {
-            if (!currentImage || !currentImage.complete) {
-                alert('Please wait for the image to load');
-                return;
-            }
-            
-            // Create high-quality download
-            const tempCanvas = document.createElement('canvas');
-            const tempCtx = tempCanvas.getContext('2d');
-            
-            // Use original image dimensions for best quality
-            tempCanvas.width = currentImage.width;
-            tempCanvas.height = currentImage.height;
-            
-            // Draw image
-            tempCtx.drawImage(currentImage, 0, 0, tempCanvas.width, tempCanvas.height);
-            
-            // Get styling values
-            const textSize = parseInt(document.getElementById('textSize').value);
-            const strokeWidth = parseInt(document.getElementById('strokeWidth').value);
-            const textColor = document.getElementById('textColor').value;
-            const strokeColor = document.getElementById('strokeColor').value;
-            const fontFamily = document.getElementById('fontFamily').value;
-            
-            // Scale text size for high quality
-            const scaledTextSize = (textSize * tempCanvas.width) / canvas.width;
-            const scaledStrokeWidth = (strokeWidth * tempCanvas.width) / canvas.width;
-            
-            // Draw text
-            textElements.forEach(element => {
-                if (!element.text) return;
-                
-                tempCtx.font = `bold ${scaledTextSize}px ${fontFamily}`;
-                tempCtx.fillStyle = textColor;
-                tempCtx.strokeStyle = strokeColor;
-                tempCtx.lineWidth = scaledStrokeWidth;
-                tempCtx.textAlign = 'center';
-                tempCtx.textBaseline = 'middle';
-                
-                const x = (element.x / 100) * tempCanvas.width;
-                const y = (element.y / 100) * tempCanvas.height;
-                
-                if (scaledStrokeWidth > 0) {
-                    tempCtx.strokeText(element.text.toUpperCase(), x, y);
-                }
-                tempCtx.fillText(element.text.toUpperCase(), x, y);
-            });
-            
-            // Download
-            const link = document.createElement('a');
-            link.download = 'meme.png';
-            link.href = tempCanvas.toDataURL('image/png');
-            link.click();
+            memeGenerator.downloadMeme();
         }
+
+        function addUserTemplate() {
+            memeGenerator.addUserTemplate();
+        }
+
+        function zoomIn() {
+            memeGenerator.zoomIn();
+        }
+
+        function zoomOut() {
+            memeGenerator.zoomOut();
+        }
+
+        function resetZoom() {
+            memeGenerator.resetZoom();
+        }
+
+        // Initialize the application
+        let memeGenerator;
+        document.addEventListener('DOMContentLoaded', () => {
+            memeGenerator = new MemeGenerator();
+        });
     </script>
 </body>
 </html>
