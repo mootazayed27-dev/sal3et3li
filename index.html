@@ -1,347 +1,504 @@
-:root {
-    --primary-color: #007bff;
-    --secondary-color: #6c757d;
-    --light-bg: #f8f9fa;
-    --border-color: #dee2e6;
-    --text-color: #333;
-    --card-bg: #ffffff;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meme Generator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container py-4">
+        <header class="text-center mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="display-5 fw-bold text-primary">🎨 Meme Generator</h1>
+                <div class="dark-mode-toggle">
+                    <input type="checkbox" id="darkModeToggle" class="d-none">
+                    <label for="darkModeToggle" class="dark-mode-switch">
+                        <span class="sun">☀️</span>
+                        <span class="moon">🌙</span>
+                        <div class="toggle-circle"></div>
+                    </label>
+                </div>
+            </div>
+            <p class="lead text-muted">Create memes easily - drag text anywhere!</p>
+        </header>
 
-/* Light Mode */
-body {
-    background-color: #f5f7fb;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: var(--text-color);
-    transition: all 0.3s ease;
-}
+        <div class="row">
+            <!-- Left Panel - Controls -->
+            <div class="col-lg-4">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">📁 Templates</h5>
+                        
+                        <div class="template-gallery mb-3">
+                            <div class="template-grid" id="templateGrid">
+                                <!-- Templates loaded by JS -->
+                            </div>
+                        </div>
+                        
+                        <div class="upload-section">
+                            <input type="file" id="uploadTemplate" class="form-control mb-2" accept="image/*">
+                            <button onclick="addUserTemplate()" class="btn btn-outline-primary w-100">Upload Image</button>
+                        </div>
+                    </div>
+                </div>
 
-.card {
-    border: none;
-    border-radius: 12px;
-    background: var(--card-bg);
-    transition: all 0.3s ease;
-}
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">✏️ Text Editor</h5>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Your Text</label>
+                            <textarea id="memeText" class="form-control" rows="3" placeholder="Type your meme text here...">TOP TEXT&#10;BOTTOM TEXT</textarea>
+                            <div class="form-text">💡 Press Enter for new lines</div>
+                        </div>
 
-.card-title {
-    color: var(--primary-color);
-    font-weight: 600;
-    margin-bottom: 20px;
-}
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <label class="form-label">Text Size</label>
+                                <input type="range" id="textSize" class="form-range" min="20" max="60" value="36">
+                                <div class="text-center"><small id="textSizeValue">36px</small></div>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">Stroke</label>
+                                <input type="range" id="strokeWidth" class="form-range" min="0" max="6" value="3">
+                                <div class="text-center"><small id="strokeWidthValue">3px</small></div>
+                            </div>
+                            
+                            <div class="col-6">
+                                <label class="form-label">Text Color</label>
+                                <input type="color" id="textColor" class="form-control form-control-color" value="#ffffff">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">Stroke Color</label>
+                                <input type="color" id="strokeColor" class="form-control form-control-color" value="#000000">
+                            </div>
+                            
+                            <div class="col-12">
+                                <label class="form-label">Font</label>
+                                <select id="fontFamily" class="form-select">
+                                    <option value="Impact">Impact (Classic)</option>
+                                    <option value="Arial Black">Arial Black</option>
+                                    <option value="Comic Sans MS">Comic Sans</option>
+                                    <option value="Verdana">Verdana</option>
+                                </select>
+                            </div>
+                        </div>
 
-/* Canvas */
-.canvas-container {
-    display: inline-block;
-    position: relative;
-    max-width: 100%;
-    margin: 0 auto;
-}
+                        <div class="d-grid gap-2 mt-3">
+                            <button onclick="updateMeme()" class="btn btn-primary">Update Meme</button>
+                            <button onclick="downloadMeme()" class="btn btn-success">💾 Download</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-#meme-canvas {
-    max-width: 100%;
-    height: auto;
-    border: 2px solid var(--border-color);
-    border-radius: 8px;
-    background: white;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
+            <!-- Right Panel - Canvas -->
+            <div class="col-lg-8">
+                <div class="card shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="canvas-container position-relative">
+                            <canvas id="meme-canvas"></canvas>
+                            <div class="canvas-overlay" id="canvasOverlay">
+                                <!-- Text boxes will be added here -->
+                            </div>
+                            <div class="zoom-controls">
+                                <button class="zoom-btn" onclick="zoomOut()">−</button>
+                                <div class="zoom-value" id="zoomValue">100%</div>
+                                <button class="zoom-btn" onclick="zoomIn()">+</button>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <small class="text-muted">📱 Drag text boxes to move • Pinch to zoom on mobile</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-.canvas-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-}
+    <script>
+        // Meme Generator - Simple & Practical
+        const canvas = document.getElementById('meme-canvas');
+        const ctx = canvas.getContext('2d');
+        const canvasOverlay = document.getElementById('canvasOverlay');
 
-/* Text Boxes */
-.text-box {
-    position: absolute;
-    cursor: move;
-    user-select: none;
-    padding: 12px 16px;
-    border-radius: 8px;
-    background: rgba(255,255,255,0.9);
-    border: 2px dashed var(--primary-color);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    max-width: 80%;
-    word-wrap: break-word;
-    pointer-events: all;
-    font-family: Impact, sans-serif;
-    font-size: 24px;
-    text-align: center;
-    color: #000;
-    transition: all 0.2s;
-}
+        // Current state
+        let currentImage = null;
+        let textElements = [];
+        let canvasScale = 1.0;
+        let isDragging = false;
+        let currentDragElement = null;
+        let dragOffsetX = 0;
+        let dragOffsetY = 0;
 
-.text-box:hover {
-    background: rgba(255,255,255,0.95);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-}
+        // Meme templates
+        const memeTemplates = [
+            { name: "Drake", url: "https://i.imgflip.com/30b1gx.jpg" },
+            { name: "Doge", url: "https://i.imgflip.com/4t0m5.jpg" },
+            { name: "Two Buttons", url: "https://i.imgflip.com/1g8my4.jpg" },
+            { name: "Distracted BF", url: "https://i.imgflip.com/1ur9b0.jpg" },
+            { name: "Change My Mind", url: "https://i.imgflip.com/24y43o.jpg" },
+            { name: "Woman Yelling", url: "https://i.imgflip.com/345v97.jpg" }
+        ];
 
-/* Dark Mode Toggle */
-.dark-mode-toggle {
-    display: flex;
-    align-items: center;
-}
+        // User templates
+        let userTemplates = JSON.parse(localStorage.getItem('userTemplates')) || [];
 
-.dark-mode-switch {
-    position: relative;
-    width: 60px;
-    height: 30px;
-    background: #f3f3f3;
-    border-radius: 999px;
-    cursor: pointer;
-    box-shadow: inset 5px 5px 15px rgba(0, 0, 0, 0.05);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 5px;
-    transition: all 0.3s ease;
-}
+        // Initialize when page loads
+        window.addEventListener('load', init);
 
-.dark-mode-switch .sun,
-.dark-mode-switch .moon {
-    font-size: 14px;
-    z-index: 2;
-}
+        function init() {
+            setupDarkMode();
+            initializeTemplateGallery();
+            setupEventListeners();
+            loadImage(memeTemplates[0].url);
+            createDefaultTextElements();
+        }
 
-.toggle-circle {
-    position: absolute;
-    width: 24px;
-    height: 24px;
-    background: white;
-    border-radius: 50%;
-    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.05);
-    left: 3px;
-    transition: all 0.3s ease;
-}
+        function setupDarkMode() {
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            const savedMode = localStorage.getItem('darkMode');
+            
+            if (savedMode === 'enabled') {
+                darkModeToggle.checked = true;
+                document.body.classList.add('dark-mode');
+            }
+            
+            darkModeToggle.addEventListener('change', function() {
+                if (this.checked) {
+                    document.body.classList.add('dark-mode');
+                    localStorage.setItem('darkMode', 'enabled');
+                } else {
+                    document.body.classList.remove('dark-mode');
+                    localStorage.setItem('darkMode', 'disabled');
+                }
+            });
+        }
 
-#darkModeToggle:checked + .dark-mode-switch {
-    background: #1F1F21;
-    box-shadow: inset 5px 5px 15px rgba(0, 0, 0, 0.5);
-}
+        function initializeTemplateGallery() {
+            const templateGrid = document.getElementById('templateGrid');
+            
+            // Load all templates
+            [...memeTemplates, ...userTemplates].forEach((template, index) => {
+                const templateItem = document.createElement('div');
+                templateItem.className = 'template-item' + (index === 0 ? ' active' : '');
+                templateItem.innerHTML = `
+                    <img src="${template.url}" alt="${template.name}" class="template-img">
+                    <span class="template-name">${template.name}</span>
+                `;
+                
+                templateItem.addEventListener('click', () => {
+                    document.querySelectorAll('.template-item').forEach(item => item.classList.remove('active'));
+                    templateItem.classList.add('active');
+                    loadImage(template.url);
+                });
+                
+                templateGrid.appendChild(templateItem);
+            });
+        }
 
-#darkModeToggle:checked + .dark-mode-switch .toggle-circle {
-    left: calc(100% - 27px);
-    background: #2C2C2F;
-    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
-}
+        function setupEventListeners() {
+            // Text input
+            document.getElementById('memeText').addEventListener('input', updateMeme);
+            
+            // Text controls
+            document.getElementById('textSize').addEventListener('input', function() {
+                document.getElementById('textSizeValue').textContent = this.value + 'px';
+                updateMeme();
+            });
+            
+            document.getElementById('strokeWidth').addEventListener('input', function() {
+                document.getElementById('strokeWidthValue').textContent = this.value + 'px';
+                updateMeme();
+            });
+            
+            document.getElementById('textColor').addEventListener('input', updateMeme);
+            document.getElementById('strokeColor').addEventListener('input', updateMeme);
+            document.getElementById('fontFamily').addEventListener('change', updateMeme);
 
-/* Template Gallery */
-.template-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    max-height: 150px;
-    overflow-y: auto;
-    padding: 8px;
-    background: var(--light-bg);
-    border-radius: 8px;
-    margin-bottom: 15px;
-}
+            // Touch/Mouse events for canvas
+            canvasOverlay.addEventListener('mousedown', startDrag);
+            canvasOverlay.addEventListener('touchstart', startDragTouch, { passive: false });
+        }
 
-.template-item {
-    cursor: pointer;
-    border-radius: 6px;
-    overflow: hidden;
-    transition: all 0.2s;
-    border: 2px solid transparent;
-    background: white;
-    position: relative;
-}
+        function loadImage(url) {
+            currentImage = new Image();
+            currentImage.crossOrigin = "anonymous";
+            currentImage.src = url;
+            
+            currentImage.onload = function() {
+                // Set canvas size with good quality
+                const maxWidth = 800;
+                const scale = Math.min(maxWidth / currentImage.width, 1);
+                
+                canvas.width = currentImage.width * scale;
+                canvas.height = currentImage.height * scale;
+                
+                // Clear and redraw
+                canvasOverlay.innerHTML = '';
+                createDefaultTextElements();
+                updateMeme();
+            };
+        }
 
-.template-item:hover {
-    transform: scale(1.05);
-}
+        function createDefaultTextElements() {
+            textElements = [
+                { text: "TOP TEXT", x: 50, y: 15 },
+                { text: "BOTTOM TEXT", x: 50, y: 85 }
+            ];
+            createTextBoxes();
+        }
 
-.template-item.active {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
-}
+        function createTextBoxes() {
+            canvasOverlay.innerHTML = '';
+            
+            textElements.forEach((element, index) => {
+                const textBox = document.createElement('div');
+                textBox.className = 'text-box';
+                textBox.textContent = element.text;
+                textBox.dataset.index = index;
+                
+                // Position text box
+                updateTextBoxPosition(textBox, element);
+                
+                canvasOverlay.appendChild(textBox);
+            });
+        }
 
-.template-img {
-    width: 100%;
-    height: 50px;
-    object-fit: cover;
-    display: block;
-}
+        function updateTextBoxPosition(textBox, element) {
+            const rect = canvas.getBoundingClientRect();
+            const x = (element.x / 100) * rect.width;
+            const y = (element.y / 100) * rect.height;
+            
+            textBox.style.left = (x - textBox.offsetWidth / 2) + 'px';
+            textBox.style.top = (y - textBox.offsetHeight / 2) + 'px';
+        }
 
-.template-name {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: rgba(0,0,0,0.8);
-    color: white;
-    font-size: 10px;
-    padding: 2px 4px;
-    text-align: center;
-    margin: 0;
-}
+        function startDrag(e) {
+            if (e.target.classList.contains('text-box')) {
+                isDragging = true;
+                currentDragElement = e.target;
+                const rect = canvas.getBoundingClientRect();
+                dragOffsetX = e.clientX - currentDragElement.getBoundingClientRect().left;
+                dragOffsetY = e.clientY - currentDragElement.getBoundingClientRect().top;
+                
+                document.addEventListener('mousemove', drag);
+                document.addEventListener('mouseup', stopDrag);
+                e.preventDefault();
+            }
+        }
 
-/* Upload Section */
-.upload-section {
-    border-top: 1px solid var(--border-color);
-    padding-top: 15px;
-}
+        function startDragTouch(e) {
+            if (e.target.classList.contains('text-box')) {
+                isDragging = true;
+                currentDragElement = e.target;
+                const touch = e.touches[0];
+                const rect = canvas.getBoundingClientRect();
+                dragOffsetX = touch.clientX - currentDragElement.getBoundingClientRect().left;
+                dragOffsetY = touch.clientY - currentDragElement.getBoundingClientRect().top;
+                
+                document.addEventListener('touchmove', dragTouch, { passive: false });
+                document.addEventListener('touchend', stopDrag);
+                e.preventDefault();
+            }
+        }
 
-/* Zoom Controls */
-.zoom-controls {
-    position: absolute;
-    bottom: 15px;
-    left: 15px;
-    background: rgba(0,0,0,0.8);
-    border-radius: 6px;
-    padding: 8px;
-    display: flex;
-    gap: 8px;
-    z-index: 20;
-}
+        function drag(e) {
+            if (!isDragging) return;
+            
+            const rect = canvas.getBoundingClientRect();
+            const x = ((e.clientX - dragOffsetX - rect.left + currentDragElement.offsetWidth / 2) / rect.width) * 100;
+            const y = ((e.clientY - dragOffsetY - rect.top + currentDragElement.offsetHeight / 2) / rect.height) * 100;
+            
+            const index = parseInt(currentDragElement.dataset.index);
+            textElements[index].x = Math.max(5, Math.min(95, x));
+            textElements[index].y = Math.max(5, Math.min(95, y));
+            
+            updateTextBoxPosition(currentDragElement, textElements[index]);
+        }
 
-.zoom-btn {
-    width: 35px;
-    height: 35px;
-    border-radius: 4px;
-    background: var(--primary-color);
-    color: white;
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    cursor: pointer;
-    font-size: 18px;
-}
+        function dragTouch(e) {
+            if (!isDragging) return;
+            e.preventDefault();
+            
+            const touch = e.touches[0];
+            const rect = canvas.getBoundingClientRect();
+            const x = ((touch.clientX - dragOffsetX - rect.left + currentDragElement.offsetWidth / 2) / rect.width) * 100;
+            const y = ((touch.clientY - dragOffsetY - rect.top + currentDragElement.offsetHeight / 2) / rect.height) * 100;
+            
+            const index = parseInt(currentDragElement.dataset.index);
+            textElements[index].x = Math.max(5, Math.min(95, x));
+            textElements[index].y = Math.max(5, Math.min(95, y));
+            
+            updateTextBoxPosition(currentDragElement, textElements[index]);
+        }
 
-.zoom-value {
-    color: white;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    padding: 0 10px;
-    min-width: 50px;
-    justify-content: center;
-}
+        function stopDrag() {
+            isDragging = false;
+            currentDragElement = null;
+            document.removeEventListener('mousemove', drag);
+            document.removeEventListener('touchmove', dragTouch);
+            document.removeEventListener('mouseup', stopDrag);
+            document.removeEventListener('touchend', stopDrag);
+            updateMeme();
+        }
 
-/* Form Controls */
-.form-control, .form-select {
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-    padding: 10px 12px;
-    background: var(--card-bg);
-    color: var(--text-color);
-}
+        function updateMeme() {
+            if (!currentImage || !currentImage.complete) return;
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw image
+            ctx.drawImage(currentImage, 0, 0, canvas.width, canvas.height);
+            
+            // Get text from textarea and split by lines
+            const textInput = document.getElementById('memeText').value;
+            const lines = textInput.split('\n').filter(line => line.trim() !== '');
+            
+            // Update text elements with new content
+            textElements.forEach((element, index) => {
+                if (lines[index]) {
+                    element.text = lines[index];
+                }
+            });
+            
+            // Update text boxes display
+            createTextBoxes();
+            
+            // Get styling values
+            const textSize = parseInt(document.getElementById('textSize').value);
+            const strokeWidth = parseInt(document.getElementById('strokeWidth').value);
+            const textColor = document.getElementById('textColor').value;
+            const strokeColor = document.getElementById('strokeColor').value;
+            const fontFamily = document.getElementById('fontFamily').value;
+            
+            // Draw text on canvas
+            textElements.forEach(element => {
+                if (!element.text) return;
+                
+                ctx.font = `bold ${textSize}px ${fontFamily}`;
+                ctx.fillStyle = textColor;
+                ctx.strokeStyle = strokeColor;
+                ctx.lineWidth = strokeWidth;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                
+                const x = (element.x / 100) * canvas.width;
+                const y = (element.y / 100) * canvas.height;
+                
+                // Draw stroke (outline)
+                if (strokeWidth > 0) {
+                    ctx.strokeText(element.text.toUpperCase(), x, y);
+                }
+                
+                // Draw fill
+                ctx.fillText(element.text.toUpperCase(), x, y);
+            });
+        }
 
-.form-control:focus, .form-select:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
-}
+        function zoomIn() {
+            canvasScale = Math.min(3, canvasScale + 0.2);
+            updateZoomDisplay();
+            updateMeme();
+        }
 
-.form-control-color {
-    height: 45px;
-    width: 100%;
-    padding: 3px;
-    border-radius: 6px;
-}
+        function zoomOut() {
+            canvasScale = Math.max(0.5, canvasScale - 0.2);
+            updateZoomDisplay();
+            updateMeme();
+        }
 
-/* Buttons */
-.btn {
-    border-radius: 8px;
-    font-weight: 500;
-    transition: all 0.2s;
-}
+        function updateZoomDisplay() {
+            document.getElementById('zoomValue').textContent = Math.round(canvasScale * 100) + '%';
+        }
 
-.btn:hover {
-    transform: translateY(-1px);
-}
+        function addUserTemplate() {
+            const fileInput = document.getElementById('uploadTemplate');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Please select an image file');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const name = file.name.split('.')[0] || 'Custom Template';
+                const newTemplate = {
+                    name: name,
+                    url: e.target.result
+                };
+                
+                userTemplates.push(newTemplate);
+                localStorage.setItem('userTemplates', JSON.stringify(userTemplates));
+                
+                // Reload template gallery
+                document.getElementById('templateGrid').innerHTML = '';
+                initializeTemplateGallery();
+                
+                fileInput.value = '';
+                alert('Template added successfully!');
+            };
+            reader.readAsDataURL(file);
+        }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .container {
-        padding: 10px;
-    }
-    
-    .template-grid {
-        grid-template-columns: repeat(2, 1fr);
-        max-height: 120px;
-    }
-    
-    .text-box {
-        font-size: 18px;
-        padding: 8px 12px;
-    }
-    
-    .dark-mode-switch {
-        width: 50px;
-        height: 25px;
-    }
-    
-    .toggle-circle {
-        width: 20px;
-        height: 20px;
-    }
-}
-
-/* DARK MODE */
-body.dark-mode {
-    background-color: #1a1a1a;
-    color: #e0e0e0;
-    --text-color: #e0e0e0;
-    --card-bg: #2d2d2d;
-    --light-bg: #3a3a3a;
-    --border-color: #444;
-}
-
-body.dark-mode .card {
-    background: var(--card-bg);
-    border-color: var(--border-color);
-}
-
-body.dark-mode .card-title {
-    color: #4dabf7;
-}
-
-body.dark-mode .form-control,
-body.dark-mode .form-select {
-    background: #3a3a3a;
-    border-color: #555;
-    color: #e0e0e0;
-}
-
-body.dark-mode .form-control:focus,
-body.dark-mode .form-select:focus {
-    border-color: #4dabf7;
-}
-
-body.dark-mode .template-grid {
-    background: #3a3a3a;
-}
-
-body.dark-mode .template-item {
-    background: #444;
-}
-
-body.dark-mode .upload-section {
-    border-top-color: #555;
-}
-
-body.dark-mode .text-box {
-    background: rgba(255,255,255,0.1);
-    color: white;
-    border-color: #4dabf7;
-}
-
-body.dark-mode #meme-canvas {
-    border-color: #555;
-    background: #2d2d2d;
-}
-
-body.dark-mode .btn-outline-primary {
-    border-color: #4dabf7;
-    color: #4dabf7;
-}
-
-body.dark-mode .btn-outline-primary:hover {
-    background: #4dabf7;
-}
+        function downloadMeme() {
+            if (!currentImage || !currentImage.complete) {
+                alert('Please wait for the image to load');
+                return;
+            }
+            
+            // Create high-quality download
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+            
+            // Use original image dimensions for best quality
+            tempCanvas.width = currentImage.width;
+            tempCanvas.height = currentImage.height;
+            
+            // Draw image
+            tempCtx.drawImage(currentImage, 0, 0, tempCanvas.width, tempCanvas.height);
+            
+            // Get styling values
+            const textSize = parseInt(document.getElementById('textSize').value);
+            const strokeWidth = parseInt(document.getElementById('strokeWidth').value);
+            const textColor = document.getElementById('textColor').value;
+            const strokeColor = document.getElementById('strokeColor').value;
+            const fontFamily = document.getElementById('fontFamily').value;
+            
+            // Scale text size for high quality
+            const scaledTextSize = (textSize * tempCanvas.width) / canvas.width;
+            const scaledStrokeWidth = (strokeWidth * tempCanvas.width) / canvas.width;
+            
+            // Draw text
+            textElements.forEach(element => {
+                if (!element.text) return;
+                
+                tempCtx.font = `bold ${scaledTextSize}px ${fontFamily}`;
+                tempCtx.fillStyle = textColor;
+                tempCtx.strokeStyle = strokeColor;
+                tempCtx.lineWidth = scaledStrokeWidth;
+                tempCtx.textAlign = 'center';
+                tempCtx.textBaseline = 'middle';
+                
+                const x = (element.x / 100) * tempCanvas.width;
+                const y = (element.y / 100) * tempCanvas.height;
+                
+                if (scaledStrokeWidth > 0) {
+                    tempCtx.strokeText(element.text.toUpperCase(), x, y);
+                }
+                tempCtx.fillText(element.text.toUpperCase(), x, y);
+            });
+            
+            // Download
+            const link = document.createElement('a');
+            link.download = 'meme.png';
+            link.href = tempCanvas.toDataURL('image/png');
+            link.click();
+        }
+    </script>
+</body>
+</html>
