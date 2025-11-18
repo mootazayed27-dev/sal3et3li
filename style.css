@@ -36,6 +36,8 @@ body {
     position: relative;
     max-width: 100%;
     margin: 0 auto;
+    overflow: hidden;
+    touch-action: none;
 }
 
 #memeCanvas {
@@ -46,6 +48,7 @@ body {
     border-radius: 10px;
     background: white;
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    touch-action: none;
 }
 
 .canvas-overlay {
@@ -76,6 +79,7 @@ body {
     z-index: 10;
     resize: none;
     overflow: hidden;
+    touch-action: none;
 }
 
 .text-area:hover {
@@ -603,7 +607,7 @@ body.dark .btn-outline-danger:hover {
     border-color: #dc3545;
 }
 
-/* Responsive Design */
+/* Mobile-specific styles */
 @media (max-width: 768px) {
     .container {
         padding: 10px;
@@ -623,15 +627,55 @@ body.dark .btn-outline-danger:hover {
         padding: 15px;
         min-width: 120px;
         min-height: 50px;
+        font-size: 14px;
     }
     
     .resize-handle {
-        width: 10px;
-        height: 10px;
+        width: 14px;
+        height: 14px;
+    }
+    
+    .delete-handle {
+        width: 24px;
+        height: 24px;
+        font-size: 14px;
     }
     
     .color-controls {
         grid-template-columns: 1fr;
+    }
+    
+    .zoom-controls {
+        bottom: 10px;
+        left: 10px;
+        padding: 6px 10px;
+    }
+    
+    .zoom-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 12px;
+    }
+    
+    .zoom-value {
+        font-size: 12px;
+        min-width: 40px;
+    }
+    
+    .canvas-container {
+        margin-bottom: 15px;
+    }
+    
+    .card-title {
+        font-size: 1.1rem;
+    }
+    
+    .display-4 {
+        font-size: 2rem;
+    }
+    
+    .lead {
+        font-size: 0.9rem;
     }
 }
 
@@ -643,4 +687,97 @@ body.dark .btn-outline-danger:hover {
     .template-img {
         height: 120px;
     }
+    
+    .text-area {
+        min-width: 100px;
+        min-height: 40px;
+        padding: 10px;
+    }
+    
+    .resize-handle {
+        width: 12px;
+        height: 12px;
+    }
+    
+    .delete-handle {
+        width: 20px;
+        height: 20px;
+        font-size: 12px;
+    }
+    
+    .zoom-controls {
+        position: relative;
+        bottom: auto;
+        left: auto;
+        margin-top: 10px;
+        justify-content: center;
+    }
+    
+    .row.g-4 {
+        gap: 15px !important;
+    }
+    
+    .card-body {
+        padding: 15px;
+    }
+}
+
+/* Improved cursor styles for better UX */
+.text-area.dragging {
+    cursor: grabbing;
+}
+
+.canvas-container.panning {
+    cursor: grabbing;
+}
+
+.resize-handle.top-left,
+.resize-handle.bottom-right {
+    cursor: nwse-resize;
+}
+
+.resize-handle.top-right,
+.resize-handle.bottom-left {
+    cursor: nesw-resize;
+}
+
+/* Touch-friendly improvements */
+@media (hover: none) and (pointer: coarse) {
+    .text-area:hover {
+        transform: none;
+    }
+    
+    .resize-handle:hover {
+        transform: none;
+    }
+    
+    .delete-handle:hover {
+        transform: none;
+    }
+    
+    .btn:hover {
+        transform: none;
+    }
+    
+    .template-item:hover {
+        transform: none;
+    }
+    
+    .template-item:hover .template-img {
+        transform: none;
+    }
+    
+    .zoom-btn:hover {
+        transform: none;
+    }
+}
+
+/* Prevent text selection during interactions */
+.no-select {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
