@@ -178,6 +178,7 @@
         let dragOffsetY = 0;
         let startPanX = 0;
         let startPanY = 0;
+        let lastTouchDistance = 0;
 
         // Meme templates - Big clear images
         const memeTemplates = [
@@ -253,6 +254,9 @@
             // Canvas interactions
             canvas.addEventListener('wheel', handleZoom);
             canvas.addEventListener('mousedown', startPan);
+            canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+            canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+            canvas.addEventListener('touchend', handleTouchEnd);
 
             // Window resize
             window.addEventListener('resize', function() {
@@ -261,6 +265,86 @@
                     updateAllTextAreas();
                 }
             });
+        }
+
+        // Touch event handlers for mobile
+        function handleTouchStart(e) {
+            e.preventDefault();
+            
+            if (e.touches.length === 1) {
+                // Single touch - check if we're touching a text element
+                const touch = e.touches[0];
+                const element = document.elementFromPoint(touch.clientX, touch.clientY);
+                
+                if (element && element.closest('.text-area')) {
+                    // We're touching a text element, let the text element handle it
+                    return;
+                }
+                
+                // Otherwise, start panning
+                startPanTouch(e);
+            } else if (e.touches.length === 2) {
+                // Two touches - prepare for pinch-to-zoom
+                const touch1 = e.touches[0];
+                const touch2 = e.touches[1];
+                lastTouchDistance = getTouchDistance(touch1, touch2);
+            }
+        }
+
+        function handleTouchMove(e) {
+            e.preventDefault();
+            
+            if (e.touches.length === 1 && isPanning) {
+                // Single touch panning
+                panTouch(e);
+            } else if (e.touches.length === 2) {
+                // Two touches - pinch to zoom
+                const touch1 = e.touches[0];
+                const touch2 = e.touches[1];
+                const touchDistance = getTouchDistance(touch1, touch2);
+                
+                if (lastTouchDistance !== 0) {
+                    const zoomIntensity = 0.01;
+                    const zoom = 1 + (touchDistance - lastTouchDistance) * zoomIntensity;
+                    
+                    canvasScale = Math.max(0.5, Math.min(3, canvasScale * zoom));
+                    updateZoomDisplay();
+                    updateMeme();
+                }
+                
+                lastTouchDistance = touchDistance;
+            }
+        }
+
+        function handleTouchEnd(e) {
+            isPanning = false;
+            lastTouchDistance = 0;
+            canvas.style.cursor = 'default';
+        }
+
+        function startPanTouch(e) {
+            if (e.touches.length !== 1) return;
+            
+            isPanning = true;
+            const touch = e.touches[0];
+            startPanX = touch.clientX - canvasOffsetX;
+            startPanY = touch.clientY - canvasOffsetY;
+            canvas.style.cursor = 'grabbing';
+        }
+
+        function panTouch(e) {
+            if (!isPanning || e.touches.length !== 1) return;
+            
+            const touch = e.touches[0];
+            canvasOffsetX = touch.clientX - startPanX;
+            canvasOffsetY = touch.clientY - startPanY;
+            updateMeme();
+        }
+
+        function getTouchDistance(touch1, touch2) {
+            const dx = touch1.clientX - touch2.clientX;
+            const dy = touch1.clientY - touch2.clientY;
+            return Math.sqrt(dx * dx + dy * dy);
         }
 
         // Initialize template gallery
@@ -414,11 +498,13 @@
             
             // Drag functionality
             textElement.addEventListener('mousedown', startDrag);
+            textElement.addEventListener('touchstart', startDragTouch, { passive: false });
             
             // Resize functionality for each handle
             const resizeHandles = textElement.querySelectorAll('.resize-handle');
             resizeHandles.forEach(handle => {
                 handle.addEventListener('mousedown', startResize);
+                handle.addEventListener('touchstart', startResizeTouch, { passive: false });
             });
 
             function startDrag(e) {
@@ -438,6 +524,28 @@
                 
                 document.addEventListener('mousemove', drag);
                 document.addEventListener('mouseup', stopDrag);
+            }
+
+            function startDragTouch(e) {
+                if (e.target.classList.contains('resize-handle') || e.target.classList.contains('delete-handle')) {
+                    return;
+                }
+                
+                e.preventDefault();
+                if (e.touches.length !== 1) return;
+                
+                isDragging = true;
+                currentDragElement = textArea;
+                
+                const rect = textElement.getBoundingClientRect();
+                const canvasRect = canvas.getBoundingClientRect();
+                const touch = e.touches[0];
+                
+                dragOffsetX = touch.clientX - rect.left;
+                dragOffsetY = touch.clientY - rect.top;
+                
+                document.addEventListener('touchmove', dragTouch, { passive: false });
+                document.addEventListener('touchend', stopDragTouch);
             }
 
             function startResize(e) {
@@ -462,12 +570,51 @@
                 document.addEventListener('mouseup', stopResize);
             }
 
+            function startResizeTouch(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                if (e.touches.length !== 1) return;
+                
+                isResizing = true;
+                currentResizeHandle = e.target;
+                currentDragElement = textArea;
+                
+                const rect = textElement.getBoundingClientRect();
+                const canvasRect = canvas.getBoundingClientRect();
+                const touch = e.touches[0];
+                
+                startX = touch.clientX;
+                startY = touch.clientY;
+                startWidth = parseInt(document.defaultView.getComputedStyle(textElement).width, 10);
+                startHeight = parseInt(document.defaultView.getComputedStyle(textElement).height, 10);
+                startLeft = rect.left - canvasRect.left;
+                startTop = rect.top - canvasRect.top;
+                
+                document.addEventListener('touchmove', resizeTouch, { passive: false });
+                document.addEventListener('touchend', stopResizeTouch);
+            }
+
             function drag(e) {
                 if (!isDragging || currentDragElement !== textArea) return;
                 
                 const canvasRect = canvas.getBoundingClientRect();
                 const x = ((e.clientX - dragOffsetX - canvasRect.left + textElement.offsetWidth / 2) / canvasRect.width) * 100;
                 const y = ((e.clientY - dragOffsetY - canvasRect.top + textElement.offsetHeight / 2) / canvasRect.height) * 100;
+                
+                textArea.x = Math.max(5, Math.min(95, x));
+                textArea.y = Math.max(5, Math.min(95, y));
+                
+                updateTextAreaPosition(textElement, textArea);
+            }
+
+            function dragTouch(e) {
+                if (!isDragging || currentDragElement !== textArea || e.touches.length !== 1) return;
+                
+                const canvasRect = canvas.getBoundingClientRect();
+                const touch = e.touches[0];
+                const x = ((touch.clientX - dragOffsetX - canvasRect.left + textElement.offsetWidth / 2) / canvasRect.width) * 100;
+                const y = ((touch.clientY - dragOffsetY - canvasRect.top + textElement.offsetHeight / 2) / canvasRect.height) * 100;
                 
                 textArea.x = Math.max(5, Math.min(95, x));
                 textArea.y = Math.max(5, Math.min(95, y));
@@ -526,11 +673,71 @@
                 updateTextAreaPosition(textElement, textArea);
             }
 
+            function resizeTouch(e) {
+                if (!isResizing || currentDragElement !== textArea || e.touches.length !== 1) return;
+                
+                const canvasRect = canvas.getBoundingClientRect();
+                const touch = e.touches[0];
+                const dx = touch.clientX - startX;
+                const dy = touch.clientY - startY;
+                
+                let newWidth = startWidth;
+                let newHeight = startHeight;
+                let newLeft = startLeft;
+                let newTop = startTop;
+
+                if (currentResizeHandle.classList.contains('bottom-right')) {
+                    newWidth = startWidth + dx;
+                    newHeight = startHeight + dy;
+                } else if (currentResizeHandle.classList.contains('bottom-left')) {
+                    newWidth = startWidth - dx;
+                    newHeight = startHeight + dy;
+                    newLeft = startLeft + dx;
+                } else if (currentResizeHandle.classList.contains('top-right')) {
+                    newWidth = startWidth + dx;
+                    newHeight = startHeight - dy;
+                    newTop = startTop + dy;
+                } else if (currentResizeHandle.classList.contains('top-left')) {
+                    newWidth = startWidth - dx;
+                    newHeight = startHeight - dy;
+                    newLeft = startLeft + dx;
+                    newTop = startTop + dy;
+                }
+
+                // Minimum size
+                newWidth = Math.max(100, newWidth);
+                newHeight = Math.max(40, newHeight);
+
+                // Update text area dimensions
+                textArea.width = newWidth;
+                textArea.height = newHeight;
+                
+                // Update position if resizing from left or top
+                if (currentResizeHandle.classList.contains('bottom-left') || currentResizeHandle.classList.contains('top-left')) {
+                    const newX = ((newLeft + newWidth / 2) / canvasRect.width) * 100;
+                    textArea.x = Math.max(5, Math.min(95, newX));
+                }
+                if (currentResizeHandle.classList.contains('top-right') || currentResizeHandle.classList.contains('top-left')) {
+                    const newY = ((newTop + newHeight / 2) / canvasRect.height) * 100;
+                    textArea.y = Math.max(5, Math.min(95, newY));
+                }
+
+                updateTextAreaPosition(textElement, textArea);
+            }
+
             function stopDrag() {
                 isDragging = false;
                 currentDragElement = null;
                 document.removeEventListener('mousemove', drag);
                 document.removeEventListener('mouseup', stopDrag);
+                updateMeme();
+            }
+
+            function stopDragTouch() {
+                isDragging = false;
+                currentDragElement = null;
+                document.removeEventListener('touchmove', dragTouch);
+                document.removeEventListener('touchend', stopDragTouch);
                 updateMeme();
             }
 
@@ -540,6 +747,15 @@
                 currentDragElement = null;
                 document.removeEventListener('mousemove', resize);
                 document.removeEventListener('mouseup', stopResize);
+                updateMeme();
+            }
+
+            function stopResizeTouch() {
+                isResizing = false;
+                currentResizeHandle = null;
+                currentDragElement = null;
+                document.removeEventListener('touchmove', resizeTouch);
+                document.removeEventListener('touchend', stopResizeTouch);
                 updateMeme();
             }
         }
